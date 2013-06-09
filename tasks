@@ -1,0 +1,17 @@
+table with list of scheduled tasks - message, time (daily, weekly, monthly,one time), method (email, sms) - edit, delete task
+create new task - message, time (daily, weekly, monthly,one time), method (email, sms)
+database - id,tag,message,time,method,method_details,creator
+
+task trigger - database scanning each minute - index on time, type of task, tag
+
+id,tag,message,type,time,method,method_details,creator,state - db reminders
+create tasks in db
+create function to execute tasks based on url parameters
+implement tasks - email, sms
+polling function to check for active tasks
+show active tasks followed by done tasks
+create option to add new task
+test code
+about
+statistics page
+
