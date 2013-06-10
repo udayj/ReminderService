@@ -22,6 +22,7 @@ from twilio.rest import TwilioRestClient
 import thread
 import time
 from datetime import datetime,timedelta
+from multiprocessing import Pool
 
 
 app = Flask(__name__)
@@ -36,7 +37,7 @@ def front():
 	
 	return render_template('front.html')
 
-def poller():
+def poller(key):
 	#note current time, year,month,day,hour,minute - calculate using offset value from config
 	#go through list and compare timestamp using offset value based on timezone(supported - IST,GMT)
 	#create separate list for acceptable tasks
@@ -189,7 +190,9 @@ if app.debug is None or app.debug is False or app.debug is True:
 	    file_handler.setFormatter(formatter)
 	    app.logger.addHandler(file_handler)
 	    app.logger.error(str(app.config))
-	    thread.start_new_thread(poller,())
+	    pool=Pool(1)
+	    pool.map(poller,[3])
+	    #thread.start_new_thread(poller,())
 
 if __name__=='__main__':
 	app.run()
