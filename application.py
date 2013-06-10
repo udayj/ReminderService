@@ -25,7 +25,7 @@ from datetime import datetime,timedelta
 
 
 app = Flask(__name__)
-app.config.from_envvar('CONFIG_FILE')
+app.config.from_envvar('CONFIG')
 app.debug=app.config['DEBUG']
 
 
@@ -180,7 +180,16 @@ def perform_task():
 		return render_template('task_completion.html')
 	
 thread.start_new_thread(poller,())
+if app.debug is None or app.debug is False or app.debug is True:   
+	    import logging
+	    from logging.handlers import RotatingFileHandler
+	    file_handler = RotatingFileHandler('/home/uday/code/reminder_service/logs/application.log', maxBytes=1024 * 1024 * 100, backupCount=20)
+	    file_handler.setLevel(logging.DEBUG)
+	    formatter = logging.Formatter("%(asctime)s - %(funcName)s - %(levelname)s - %(message)s")
+	    file_handler.setFormatter(formatter)
+	    app.logger.addHandler(file_handler)
+	    app.logger.error(str(app.config))
 
 if __name__=='__main__':
-	app.run(port=5001)
+	app.run()
 	
