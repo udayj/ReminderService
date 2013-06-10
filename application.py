@@ -179,7 +179,7 @@ def perform_task():
 	else:
 		return render_template('task_completion.html')
 	
-thread.start_new_thread(poller,())
+
 if app.debug is None or app.debug is False or app.debug is True:   
 	    import logging
 	    from logging.handlers import RotatingFileHandler
@@ -189,6 +189,7 @@ if app.debug is None or app.debug is False or app.debug is True:
 	    file_handler.setFormatter(formatter)
 	    app.logger.addHandler(file_handler)
 	    app.logger.error(str(app.config))
+	    thread.start_new_thread(poller,())
 
 if __name__=='__main__':
 	app.run()
