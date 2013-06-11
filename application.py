@@ -37,6 +37,7 @@ def front():
 	
 	return render_template('front.html')
 
+"""
 def poller(key):
 	#note current time, year,month,day,hour,minute - calculate using offset value from config
 	#go through list and compare timestamp using offset value based on timezone(supported - IST,GMT)
@@ -68,7 +69,7 @@ def execute(task):
 	db=client[app.config['DATABASE']]
 	if result.status_code!=200:
 		app.logger.debug('Problem executing task with id:'+str(task['_id']))
-
+"""
 		
 
 
@@ -190,8 +191,8 @@ if app.debug is None or app.debug is False or app.debug is True:
 	    file_handler.setFormatter(formatter)
 	    app.logger.addHandler(file_handler)
 	    app.logger.error(str(app.config))
-	    pool=Pool(1)
-	    pool.map(poller,[3])
+	    #pool=Pool(1)
+	    #pool.map(poller,[3])
 	    #thread.start_new_thread(poller,())
 
 if __name__=='__main__':
