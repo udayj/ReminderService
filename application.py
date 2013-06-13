@@ -35,42 +35,7 @@ mail=Mail(app)
 @app.route('/')
 def front():
 	
-	return render_template('front.html')
-
-"""
-def poller(key):
-	#note current time, year,month,day,hour,minute - calculate using offset value from config
-	#go through list and compare timestamp using offset value based on timezone(supported - IST,GMT)
-	#create separate list for acceptable tasks
-	#send to separate function to implement tasks - mark as done
-	#write any errors to log
-	#sleep for 1 minute
-	while True:
-		system_time=datetime.now()+timedelta(hours=app.config['SYSTEM_OFFSET_HOURS'],minutes=app.config['SYSTEM_OFFSET_MINUTES'])
-		app.logger.debug(system_time.minute)
-		client=MongoClient()
-		db=client[app.config['DATABASE']]
-		tasks=db.reminders.find()
-		acceptable=[]
-		for task in tasks:
-			if task['state']=='active' and isEqual(task['time'],system_time,task['timezone']):
-				acceptable.append(task)
-		app.logger.debug(str(acceptable))
-		for task in acceptable:
-			app.logger.debug(task['message'])
-			execute(task)
-		app.logger.debug('done with the loop')
-		time.sleep(60)
-
-
-def execute(task):
-	result=requests.get(app.config['HOST']+'/perform_task?id='+str(task['_id']))
-	client=MongoClient()
-	db=client[app.config['DATABASE']]
-	if result.status_code!=200:
-		app.logger.debug('Problem executing task with id:'+str(task['_id']))
-"""
-		
+	return redirect(url_for('task_list'))
 
 
 def isEqual(task_time,system_time,task_timezone):
@@ -147,8 +112,6 @@ def delete_task():
 	return redirect(url_for('task_list'))
 	
 
-
-
 @app.route('/perform_task')
 def perform_task():
 	_id=request.args.get('id')
@@ -170,7 +133,8 @@ def perform_task():
 		db.reminders.save(task)
 		return render_template('task_completion.html')	
 	if task['method']=='email' and task['state']=='active':
-		msg = Message('Reminder', sender = app.config['MAIL_SENDER'], recipients =[task['details']])
+
+		msg = Message('Reminder: '+task['message'], sender = app.config['MAIL_SENDER'], recipients =[task['details']])
 
 		msg.body = task['message']
 		mail.send(msg)

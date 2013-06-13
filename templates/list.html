@@ -14,7 +14,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="span9">
-				<form class="form-horizontal well" method="post">
+				<form class="form-horizontal well" method="post" id="form">
 			        <fieldset>
 			          <legend>Add New Task</legend>
 			          <div class="control-group">
@@ -42,6 +42,13 @@
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
+			           <!--<div class="control-group">
+			            <label class="control-label" for="input01">Time</label>
+			            <div class="controls">
+			              <input type="time" id="time" name="time" value="09:00 AM">
+			              
+			            </div>
+			          </div>-->
 			          <div class="control-group info">
 			            <label class="control-label" for="selectError">Time</label>
 			            <div class="controls">
@@ -162,4 +169,22 @@
 		</div>
 	</div>
 </body>
+<script>
+
+$('#form').submit(function(){
+
+var message=$('#message').val();
+var date=$('#datepicker').val();
+var recipients=$('#details').val();
+
+if(message==null || message.trim()=="" || date==null || date.trim()=="" || recipients==null || recipients=="")
+{
+	alert('Message, Date and Receipients cannot be empty');
+	return false;
+}
+
+
+});
+$('#datepicker').datepicker({minDate:new Date()});
+</script>
 </html>
