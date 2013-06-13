@@ -60,6 +60,14 @@ def isEqual(task_time,system_time,task_timezone):
 		return False
 	return True
 
+def validComponents(task):
+	keys=['message','time','timezone','type','method','details','datepicker']
+	for key in keys:
+		if key not in task:
+			return False
+
+	return True
+
 
 @app.route('/task_list',methods=['GET','POST'])
 def task_list():
@@ -67,6 +75,11 @@ def task_list():
 		return task['state']+str(task['time'])
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
+	tasks=db.reminders.find()
+	output=[]
+	for task in tasks:
+		output.append(task)
+	
 	if request.method=='POST':
 		data={}
 		for name,value in dict(request.form).iteritems():
@@ -74,31 +87,44 @@ def task_list():
 		app.logger.debug(str(data))
 
 		task={}
-		date=data['datepicker'].split("/")
-		year=int(date[2])
-		month=int(date[0])
-		day=int(date[1])
+		if not validComponents(data):
+			app.logger.error('Problem with task form data. Cannot submit task')
+			output.sort(key=sorter)
+			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later')
+		try:
+			date=data['datepicker'].split("/")
+			year=int(date[2])
+			month=int(date[0])
+			day=int(date[1])
 
-		time_components=data['time'].split(":")
-		hours=0
-		if time_components[2]=='AM' or time_components[0]=='12':
+
+
+			time_components=data['time'].split(":")
+			hours=0
 			hours=int(time_components[0])
-		else:
-			hours=int(time_components[0])+12
-		minutes=int(time_components[1])
-		task['message']=data['message']
-		task['type']='one-time'
-		task['time']=datetime(year,month,day,hours,minutes)
-		task['state']='active'
-		task['timezone']=data['timezone']
-		task['method']=data['method'].lower()
-		task['details']=data['details'].lower()
-		task['creator']='admin'
-		db.reminders.save(task)
-	tasks=db.reminders.find()
-	output=[]
-	for task in tasks:
-		output.append(task)
+
+			"""if time_components[2]=='AM' or time_components[0]=='12':
+				hours=int(time_components[0])
+			else:
+				hours=int(time_components[0])+12"""
+
+
+			minutes=int(time_components[1])
+			task['message']=data['message']
+			task['type']='one-time'
+			task['time']=datetime(year,month,day,hours,minutes)
+			task['state']='active'
+			task['timezone']=data['timezone']
+			task['method']=data['method'].lower()
+			task['details']=data['details'].lower()
+			task['creator']='admin'
+			db.reminders.save(task)
+			output.append(task)
+		except:
+			app.logger.error('Problem submitting task')
+			output.sort(key=sorter)
+			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later')
+			
 	output.sort(key=sorter)
 	return render_template('list.html',tasks=output)
 
@@ -109,6 +135,7 @@ def delete_task():
 	db=client[app.config['DATABASE']]
 	app.logger.debug(_id)
 	db.reminders.remove({'_id':ObjectId(_id)})
+	app.logger.debug('Deleted task:'+_id)
 	return redirect(url_for('task_list'))
 	
 

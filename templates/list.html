@@ -1,19 +1,15 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-	<link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-  <script>
-  $(function() {
-    $( "#datepicker" ).datepicker();
-  });
-  </script>
+{% extends "base.html" %}
+
+{% block content %}
 <body>
 	<div class="container">
 		<div class="row">
+			
+
 			<div class="span9">
+				<div>
+					{{error}}
+				</div>
 				<form class="form-horizontal well" method="post" id="form">
 			        <fieldset>
 			          <legend>Add New Task</legend>
@@ -42,14 +38,14 @@
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
-			           <!--<div class="control-group">
+			           <div class="control-group">
 			            <label class="control-label" for="input01">Time</label>
 			            <div class="controls">
-			              <input type="time" id="time" name="time" value="09:00 AM">
+			              <input type="time" id="time" name="time" value="09:00:AM">
 			              
 			            </div>
-			          </div>-->
-			          <div class="control-group info">
+			          </div>
+			          <!--<div class="control-group info">
 			            <label class="control-label" for="selectError">Time</label>
 			            <div class="controls">
 			              <select id="time" name="time">
@@ -83,7 +79,7 @@
 			              </select>
 			              
 			            </div>
-          			   </div>
+          			   </div>-->
           			   <div class="control-group info">
 			            <label class="control-label" for="selectError">Method</label>
 			            <div class="controls">
@@ -176,8 +172,9 @@ $('#form').submit(function(){
 var message=$('#message').val();
 var date=$('#datepicker').val();
 var recipients=$('#details').val();
+var time=$('#time').val();
 
-if(message==null || message.trim()=="" || date==null || date.trim()=="" || recipients==null || recipients=="")
+if(message==null || message.trim()=="" || date==null || date.trim()=="" || recipients==null || recipients=="" || time==null || time.trim()=="")
 {
 	alert('Message, Date and Receipients cannot be empty');
 	return false;
@@ -187,4 +184,4 @@ if(message==null || message.trim()=="" || date==null || date.trim()=="" || recip
 });
 $('#datepicker').datepicker({minDate:new Date()});
 </script>
-</html>
+{% endblock %}
