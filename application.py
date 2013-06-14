@@ -26,6 +26,8 @@ from multiprocessing import Pool
 
 
 SECRET_KEY='SECRET'
+
+
 SALT='123456789passwordsalt'
 
 app = Flask(__name__)
@@ -54,7 +56,32 @@ class User(UserMixin):
 @app.route('/')
 def front():
 	
-	return redirect(url_for('task_list'))
+	return render_template('front.html',active='front')
+
+@app.route('/new_user_task')
+def new_user_task():
+	
+	return render_template('new_user_task.html',active='new_user_task')
+
+@app.route('/admin')
+def admin():
+	def sorter(task):
+		return task['state']+str(task['time'])
+
+	password=request.args.get('password')
+	if password=='password':
+
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		
+		tasks=db.reminders.find()
+		output=[]
+		for task in tasks:
+			output.append(task)
+		output.sort(key=sorter)
+		return render_template('list.html',tasks=output)
+	else:
+		return redirect(url_for('front'))		
 
 
 def isEqual(task_time,system_time,task_timezone):
@@ -126,7 +153,7 @@ def activate():
 @app.route('/signup',methods=['GET','POST'])
 def signup():
 	if request.method=='GET':
-		return render_template('/login.html')
+		return render_template('login.html',active='signup')
 	else:
 		
 		data={}
@@ -143,7 +170,7 @@ def signup():
 		exist_user=db.users.find({'email':data['email']})
 		try:
 			exist_user.next()
-			return render_template('login.html',signup_error='Email already exists',username=username,email=data['email'])
+			return render_template('login.html',active='signup',signup_error='Email already exists',username=username,email=data['email'])
 		except StopIteration:
 			pass
 
@@ -172,7 +199,7 @@ def signup():
 @app.route('/login',methods=['GET','POST'])
 def login():
 	if request.method=='GET':
-		return render_template('/login.html')
+		return render_template('login.html',active='login')
 	data={}
 	for name,value in dict(request.form).iteritems():
 		data[name]=value[0]
@@ -182,7 +209,7 @@ def login():
 		password=data['password']
 	else:
 		app.logger.debug('Login Form submitted without fields')
-		return render_template('/login.html')
+		return render_template('login.html',active='login')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	password=hashlib.sha512(SALT+password).hexdigest()
@@ -194,9 +221,9 @@ def login():
 			flash('Logged in!')
 			return redirect(url_for('task_list'))
 		else:
-			return render_template('/login.html',error='Cannot login. Account still inactive')
+			return render_template('login.html',error='Cannot login. Account still inactive',active='login')
 	except StopIteration:
-		return render_template('/login.html',error='Cannot login. Wrong credentials',
+		return render_template('login.html',error='Cannot login. Wrong credentials',
 								active='login')
 
 @app.route("/logout")
@@ -207,12 +234,14 @@ def logout():
 	return redirect(url_for('front'))
 
 @app.route('/task_list',methods=['GET','POST'])
+@login_required
 def task_list():
 	def sorter(task):
 		return task['state']+str(task['time'])
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
-	tasks=db.reminders.find()
+	_id=current_user.id
+	tasks=db.reminders.find({'creator_id':ObjectId(_id)})
 	output=[]
 	for task in tasks:
 		output.append(task)
@@ -255,15 +284,16 @@ def task_list():
 			task['method']=data['method'].lower()
 			task['details']=data['details'].lower()
 			task['creator']='admin'
+			task['creator_id']=ObjectId(current_user.id)
 			db.reminders.save(task)
 			output.append(task)
 		except:
 			app.logger.error('Problem submitting task')
 			output.sort(key=sorter)
-			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later')
+			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later',active='task_list')
 			
 	output.sort(key=sorter)
-	return render_template('list.html',tasks=output)
+	return render_template('list.html',tasks=output,active='task_list')
 
 @app.route('/delete_task')
 def delete_task():
