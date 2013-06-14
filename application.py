@@ -25,12 +25,31 @@ from datetime import datetime,timedelta
 from multiprocessing import Pool
 
 
+SECRET_KEY='SECRET'
+SALT='123456789passwordsalt'
+
 app = Flask(__name__)
 app.config.from_envvar('CONFIG')
 app.debug=app.config['DEBUG']
 
+login_manager = LoginManager()
+login_manager.login_view = "login"
+login_manager.login_message = u"Please log in to access this page."
 
 mail=Mail(app)
+
+class User(UserMixin):
+    def __init__(self, name, _id, password,email,activation_hash=None,active=True):
+        self.name = name
+        self.id = _id
+        self.active = active
+        self.password=password
+        self.email=email
+        self.activation_hash=activation_hash
+        
+    def is_active(self):
+        return self.active
+
 
 @app.route('/')
 def front():
@@ -68,6 +87,124 @@ def validComponents(task):
 
 	return True
 
+@login_manager.user_loader
+def load_user(_id):
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	user=db.users.find({'_id':ObjectId(_id)})
+	try:
+		user=user.next()
+		
+		ret_user=User(name=user['name'],email=user['email'],password="",active=user['active'],_id=str(user['_id']))
+		return ret_user
+	except StopIteration:
+		return None
+
+login_manager.setup_app(app)
+
+
+
+@app.route('/activate')
+def activate():
+	activation_hash=request.args.get('hash')
+	if not activation_hash:
+		return render_template('activate.html',message='Sorry account not activated')
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	user=db.users.find({'activation_hash':activation_hash})
+	try:
+		user=user.next()
+		user['active']=True
+		db.users.save(user)
+		ret_user=User(name=user['name'],email=user['email'],password="",active=user['active'],_id=str(user['_id']))
+		login_user(ret_user)
+		return render_template('activate.html',message='Welcome to Reminder Service. Your account has been activated')
+	except StopIteration:
+		return render_template('activate.html',message='Sorry account not activated')
+
+
+@app.route('/signup',methods=['GET','POST'])
+def signup():
+	if request.method=='GET':
+		return render_template('/login.html')
+	else:
+		
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0]
+		username=None
+		if 'username' in data:
+			username=data['username']
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		salt='reminderserviceactivateusingtoken'
+		activation_hash=hashlib.sha512(salt+data['email']).hexdigest()[10:30]
+		
+		exist_user=db.users.find({'email':data['email']})
+		try:
+			exist_user.next()
+			return render_template('login.html',signup_error='Email already exists',username=username,email=data['email'])
+		except StopIteration:
+			pass
+
+		_id=db.users.save({'name':username,
+					   'email':data['email'],
+					   'password':hashlib.sha512(SALT+data['password']).hexdigest(),
+					   'activation_hash':activation_hash,
+					   'active':False})
+		#user=User(name=username,email=data['email'],password=data['password'],active=False,id=str(_id))
+		msg = Message('Welcome to Reminder Service', sender = app.config['MAIL_SENDER'], recipients = [data['email']])
+		
+		
+		msg.body = 'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash
+		app.logger.debug('Sending activation email to:'+data['email'])
+		#app.logger.debug(activation_hash)
+		#app.logger.debug(str(app.extensions['mail'].server))
+		try:
+			mail.send(msg)
+		except Exception:
+			db.users.remove({'_id':_id})
+			return render_template('login.html',signup_error='Problem sending email. Account not created. Try again later.',
+									username=username,email=data['email'])
+		return render_template('checkmail.html')
+
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+	if request.method=='GET':
+		return render_template('/login.html')
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0]
+	username=None
+	if 'username' in data and 'password' in data:
+		username=data['username']
+		password=data['password']
+	else:
+		app.logger.debug('Login Form submitted without fields')
+		return render_template('/login.html')
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	password=hashlib.sha512(SALT+password).hexdigest()
+	user=db.users.find({'email':username,'password':password})
+	try:
+		user=user.next()
+		ret_user=User(name=user['name'],email=user['email'],password="",active=user['active'],_id=str(user['_id']))
+		if login_user(ret_user):
+			flash('Logged in!')
+			return redirect(url_for('task_list'))
+		else:
+			return render_template('/login.html',error='Cannot login. Account still inactive')
+	except StopIteration:
+		return render_template('/login.html',error='Cannot login. Wrong credentials',
+								active='login')
+
+@app.route("/logout")
+@login_required
+def logout():
+	logout_user()
+	flash("Logged out!")
+	return redirect(url_for('front'))
 
 @app.route('/task_list',methods=['GET','POST'])
 def task_list():

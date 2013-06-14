@@ -10,6 +10,9 @@
   });
   </script>
 </head>
+<body>
+  <div class="container">
+
 <div class="navbar navbar-inverse">
     <div class="navbar-inner">
       <div class="container" style="width: auto;">
@@ -27,16 +30,28 @@
           </ul>
             
           <ul class="nav pull-right">
-            <li><a href="#">Sign Up</a></li>
-            
-            <li><a href="#">Login</a></li>
+               {% if not current_user.email %}
+                
+                <li id='signup' class="pull-right"><a href="/signup">SignUp</a></li>
+                <li id='login' class="pull-right"><a href="/login">Login</a></li>
+                
+                {% else %}
+                <li class="pull-right"><a href="#"> Hi,
+                {{current_user.name}}</a>
+                </li>
+                <li class="pull-right"><a href="/logout">Logout</a></li>
+                
+                
+                {% endif %}
             
           </ul>
         </div><!-- /.nav-collapse -->
       </div>
     </div><!-- /navbar-inner -->
   </div><!-- /navbar -->
+</div>
   {% block content %}
   {% endblock %}
+</body>
 </html>
 

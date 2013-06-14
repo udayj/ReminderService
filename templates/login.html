@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <div class="container">
+        <div class="row">
+          <div class="span7">
+
+      	   
+           <div class="row">
+            <div class="span6">
+              <div>{{signup_error}}</div>
+           <form id="form" class="form-horizontal well" action="/signup" method="post">
+            <fieldset>
+              <legend>Create a new account here</legend>
+              <div class="control-group">
+                
+                  <label class="control-label" for="email">Email Id </label>
+                  <div class="controls">
+                  <input type="text" id="email"  name="email" placeholder="{{email}}" value="{{email}}">
+                  </div>
+              </div>
+              <div class="control-group">
+                
+                  <label class="control-label" for="username" >Name</label>
+                  <div class="controls">
+                  <input type="text" id="username" name="username" placeholder="{{username}}" value="{{username}}">
+                  
+                </div>
+              </div>
+              <div class="control-group">
+                
+                  <label class="control-label" for="password">Password</label>
+                  <div class="controls">
+                  <input type="password" id="password" name="password">
+                  <p class="help-block">Should be atleast 5 characters</p>
+                </div>
+              </div>
+              <div class="control-group">
+                
+                  <label class="control-label" for="confirm_password">Confirm Password</label>
+                  <div class="controls">
+                  <input type="password" id="confirm_password" name="confirm_password">
+                  
+                </div>
+              </div>
+              <div class="form-actions">
+                <input type="submit" class="btn btn-primary"></input>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+        <div class="span5" style="position:relative;">
+          <div>{{error}}</div>
+          <form class="well form-horizontal" action="/login" method="post" id="login">
+            <fieldset>
+              <legend>Already a member? <br>Login below</legend>
+              
+                               
+                  
+                  <input type="text" id="name" name="username" placeholder="Email/Username">
+                   
+                  <br>
+                  <br>
+                
+                  
+                  
+                  <input type="password" id="login_password" name="password" placeholder="Password" onkeydown="if (event.keyCode==19) { document.getElementById('login_submit').focus();}">
+                  <br>
+                  <br>
+                  <button id="login_submit" type="submit" class="btn btn-primary" style="margin-bottom:0px;">Submit</button>
+                  
+                
+              
+            </fieldset>
+          </form>
+        </div>
+      
+      </div>
+    
+      </div>
+      
+<script>
+$('#form').submit(function(){
+      var username=$('#username').val();
+      var email=$('#email').val()
+      var password=$('#password').val();
+      var confirm_password=$('#confirm_password').val();
+      if(email==null || email.trim()=="" || password==null || password.trim()=="" || username==null || username.trim()=="")
+      {
+        alert("Email, password and name cannot be empty");
+        return false;
+
+      }
+      if(password!=confirm_password)
+      {
+        alert("Passwords do not match");
+        return false;
+      }
+      if(password.length<5)
+      {
+        alert("Password should be atleast 5 characters");
+        return false;
+      }
+
+
+    });
+$('#login').submit(function(){
+      var name=$('#name').val();
+  var password=$('#login_password').val();
+  if(name==null || name.trim()=="" || password==null || password.trim()=="")
+  {
+    alert("Email/Username/Password cannot be empty");
+    return false;
+  }
+    });
+  });
+
+
+</script>
+      {% endblock %}
