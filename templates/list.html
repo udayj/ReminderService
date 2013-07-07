@@ -34,7 +34,7 @@
 							{{task['message']}}
 						</td>
 						<td>
-							{{task['time']}}
+							{{task['time_output']}}
 						</td>
 						<td>
 							{{task['method']}}
@@ -70,20 +70,82 @@
 			          <div class="control-group info">
 			            <label class="control-label">Type</label>
 			            <div class="controls">
-			              <select id="type" name="type">
+			              <select id="type" name="type" onchange="input_controller(this)">
 			                <option>One-Time</option>
+			                <option>Daily</option>
+			                <option>Weekly</option>
+			                <option>Monthly</option>
 			                
 			              </select>
 			              
 			            </div>
           			   </div>
-          			   <div class="control-group">
+
+          			   <div class="control-group" id="date-controller">
 			            <label class="control-label" for="input01">Date</label>
 			            <div class="controls">
 			              <input type="text" class="input-xlarge" id="datepicker" name="datepicker">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
+
+			          <div class="control-group info" id="day-of-week-controller" style="display:none;">
+			            <label class="control-label">Day Of Week</label>
+			            <div class="controls">
+			              <select id="week-type" name="week-type">
+			                <option>Monday</option>
+			                <option>Tuesday</option>
+			                <option>Wednesday</option>
+			                <option>Thursday</option>
+			                <option>Friday</option>
+			                <option>Saturday</option>
+			                <option>Sunday</option>
+			              </select>
+			              
+			            </div>
+          			   </div>
+
+          			   <div class="control-group info" id="day-of-month-controller" style="display:none;">
+			            <label class="control-label">Day Of Month</label>
+			            <div class="controls">
+			              <select id="month-type" name="month-type">
+			                <option>1</option>
+			                <option>2</option>
+			                <option>3</option>
+			                <option>4</option>
+			                <option>5</option>
+			                <option>6</option>
+			                <option>7</option>
+			                <option>8</option>
+			                <option>9</option>
+			                <option>10</option>
+			                <option>11</option>
+			                <option>12</option>
+			                <option>13</option>
+			                <option>14</option>
+			                <option>15</option>
+			                <option>16</option>
+			                <option>17</option>
+			                <option>18</option>
+			                <option>19</option>
+			                <option>20</option>
+			                <option>21</option>
+			                <option>22</option>
+			                <option>23</option>
+			                <option>24</option>
+			                <option>25</option>
+			                <option>26</option>
+			                <option>27</option>
+			                <option>28</option>
+			                <option>29</option>
+			                <option>30</option>
+			                <option>31</option>
+			                
+			              </select>
+			              
+			            </div>
+          			   </div>
+
 			           <div class="control-group">
 			            <label class="control-label" for="input01">Time</label>
 			            <div class="controls">
@@ -173,15 +235,77 @@ var message=$('#message').val();
 var date=$('#datepicker').val();
 var recipients=$('#details').val();
 var time=$('#time').val();
+var type=$('#type').val();
 
-if(message==null || message.trim()=="" || date==null || date.trim()=="" || recipients==null || recipients=="" || time==null || time.trim()=="")
+
+if(type=='One-Time')
 {
-	alert('Message, Date and Receipients cannot be empty');
-	return false;
+	if(message==null || message.trim()=="" || date==null || date.trim()=="" || recipients==null || recipients=="" || time==null || time.trim()=="")
+	{
+		alert('Message, Date and Recipients cannot be empty');
+		return false;
+	}
 }
+if(type=='Daily')
+{
+	if(message==null || message.trim()=="" || recipients==null || recipients=="" || time==null || time.trim()=="")
+	{
+		alert('Message, Time and Recipients cannot be empty');
+		return false;
+	}	
+}
+if(type=='Weekly')
+{
+	var day_of_week=$('#week-type').val();
+	if(message==null || message.trim()=="" || recipients==null || recipients=="" || time==null || time.trim()=="" || day_of_week==null || day_of_week.trim()=="")
+	{
+		alert('Message, Day of Week, Time and Recipients cannot be empty');
+		return false;
+	}	
+}
+if(type=='Monthly')
+{
+	var day_of_month=$('#month-type').val();
+	if(message==null || message.trim()=="" || recipients==null || recipients=="" || time==null || time.trim()=="" || day_of_month==null || day_of_month.trim()=="")
+	{
+		alert('Message, Day of Month, Time and Recipients cannot be empty');
+		return false;
+	}	
+}
+
 
 
 });
 $('#datepicker').datepicker({minDate:new Date()});
+
+function input_controller(obj)
+{
+	
+	var type=obj.value;
+	if(type=='Daily'){
+		$('#date-controller').css('display','none');
+		$('#day-of-week-controller').css('display','none');
+		$('#day-of-month-controller').css('display','none');
+	}
+	if(type=='One-Time')
+	{
+		$('#date-controller').css('display','');
+		$('#day-of-week-controller').css('display','none');
+		$('#day-of-month-controller').css('display','none');
+	}
+	if(type=='Weekly')
+	{
+		$('#day-of-week-controller').css('display','');
+		$('#date-controller').css('display','none');
+		$('#day-of-month-controller').css('display','none');
+	}
+	if(type=="Monthly")
+	{
+		$('#day-of-month-controller').css('display','');
+		$('#day-of-week-controller').css('display','none');
+		$('#date-controller').css('display','none');
+	}
+
+}
 </script>
 {% endblock %}

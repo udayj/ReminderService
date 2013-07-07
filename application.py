@@ -225,7 +225,6 @@ def login():
 	except StopIteration:
 		return render_template('login.html',error='Cannot login. Wrong credentials',
 								active='login')
-
 @app.route("/logout")
 @login_required
 def logout():
@@ -233,17 +232,32 @@ def logout():
 	flash("Logged out!")
 	return redirect(url_for('front'))
 
+
+
 @app.route('/task_list',methods=['GET','POST'])
 @login_required
 def task_list():
 	def sorter(task):
-		return task['state']+str(task['time'])
+		return task['state']+task['type']+str(task['time'])
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	_id=current_user.id
 	tasks=db.reminders.find({'creator_id':ObjectId(_id)})
 	output=[]
 	for task in tasks:
+		task['time_output']=''
+		if task['type']=='one-time':
+			task['time_output']=task['time']
+		elif task['type']=='daily':
+			task['time_output']='Daily - '+str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+		elif task['type']=='weekly':
+			task['time_output']='Weekly - every '+str(task['day_of_week']).title()+"  "+\
+								str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+		else:
+
+			task['time_output']='Monthly - day '+str(task['day_of_month'])+" of every month "+\
+								str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+
 		output.append(task)
 	
 	if request.method=='POST':
@@ -251,6 +265,7 @@ def task_list():
 		for name,value in dict(request.form).iteritems():
 			data[name]=value[0].strip()
 		app.logger.debug(str(data))
+		
 
 		task={}
 		if not validComponents(data):
@@ -258,10 +273,16 @@ def task_list():
 			output.sort(key=sorter)
 			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later')
 		try:
-			date=data['datepicker'].split("/")
-			year=int(date[2])
-			month=int(date[0])
-			day=int(date[1])
+			year=2013
+			month=7
+			day=7
+			try:
+				date=data['datepicker'].split("/")
+				year=int(date[2])
+				month=int(date[0])
+				day=int(date[1])
+			except:
+				pass
 
 
 
@@ -277,13 +298,15 @@ def task_list():
 
 			minutes=int(time_components[1])
 			task['message']=data['message']
-			task['type']='one-time'
+			task['type']=data['type'].lower()
 			task['time']=datetime(year,month,day,hours,minutes)
 			task['state']='active'
 			task['timezone']=data['timezone']
 			task['method']=data['method'].lower()
 			task['details']=data['details'].lower()
 			task['creator']='admin'
+			task['day_of_week']=data['week-type'].lower()
+			task['day_of_month']=int(data['month-type'].lower())
 			task['creator_id']=ObjectId(current_user.id)
 			db.reminders.save(task)
 			output.append(task)
@@ -333,7 +356,8 @@ def perform_task():
 		msg.body = task['message']
 		mail.send(msg)
 		app.logger.debug('Sending reminder email to:'+task['details'])
-		task['state']='done'
+		if(task['type']=='one-time'):
+			task['state']='done'
 		db.reminders.save(task)
 		return render_template('task_completion.html')
 	else:
