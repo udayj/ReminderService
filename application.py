@@ -309,6 +309,18 @@ def task_list():
 			task['day_of_month']=int(data['month-type'].lower())
 			task['creator_id']=ObjectId(current_user.id)
 			db.reminders.save(task)
+			task['time_output']=''
+			if task['type']=='one-time':
+				task['time_output']=task['time']
+			elif task['type']=='daily':
+				task['time_output']='Daily - '+str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+			elif task['type']=='weekly':
+				task['time_output']='Weekly - every '+str(task['day_of_week']).title()+"  "+\
+									str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+			else:
+
+				task['time_output']='Monthly - day '+str(task['day_of_month'])+" of every month "+\
+									str(task['time'].hour)+':'+str(task['time'].minute)+':00'
 			output.append(task)
 		except:
 			app.logger.error('Problem submitting task')
