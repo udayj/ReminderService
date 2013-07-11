@@ -354,7 +354,7 @@ def perform_task():
 		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
 		client = TwilioRestClient(account_sid, auth_token)
 		message = client.sms.messages.create(body=task['message'],
-	    		to="+"+task['details'],
+	    		to="+91"+task['details'],
 				from_="+14157499397")
 
 		app.logger.debug(message.sid)
