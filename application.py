@@ -382,6 +382,7 @@ def perform_task():
                                   #from_="+16065474465", # Must be a valid Twilio number
                                    from_="+14157499397",
                                    url="http://166.78.236.68:86/static/data/response_"+_id+".xml",
+                                   method='get',
                                    record="true",
                                    timeout="30")
 		app.logger.debug('Checking voice reminders')
