@@ -308,7 +308,17 @@ def task_list():
 			task['day_of_week']=data['week-type'].lower()
 			task['day_of_month']=int(data['month-type'].lower())
 			task['creator_id']=ObjectId(current_user.id)
-			db.reminders.save(task)
+
+			_id=db.reminders.save(task)
+			if task['method']=='voice':
+				output_file=codecs.open('static/data/response_'+str(_id)+'.xml','w','utf-8')
+				response='<?xml version="1.0" encoding="UTF-8"?>\
+					<Response>\
+					    <Say voice="male" language="en-IN">'+task['message']+'</Say>\
+					</Response>'
+				output_file.write(response)
+				output_file.close()
+
 			task['time_output']=''
 			if task['type']=='one-time':
 				task['time_output']=task['time']
@@ -322,7 +332,8 @@ def task_list():
 				task['time_output']='Monthly - day '+str(task['day_of_month'])+" of every month "+\
 									str(task['time'].hour)+':'+str(task['time'].minute)+':00'
 			output.append(task)
-		except:
+		except Exception as inst:
+			app.logger.debug(inst)
 			app.logger.error('Problem submitting task')
 			output.sort(key=sorter)
 			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later',active='task_list')
@@ -357,10 +368,28 @@ def perform_task():
 	    		to="+91"+task['details'],
 				from_="+14157499397")
 
-		app.logger.debug(message.sid)
-		task['state']='done'
+		
+		if(task['type']=='one-time'):
+			task['state']='done'
 		db.reminders.save(task)
 		return render_template('task_completion.html')	
+
+	if task['method']=='voice' and task['state']=='active':
+		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
+		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
+		client = TwilioRestClient(account_sid, auth_token)
+		call = client.calls.create(to="+91"+task['details'],  # Any phone number
+                                  #from_="+16065474465", # Must be a valid Twilio number
+                                   from_="+14157499397",
+                                   url="http://166.78.236.68:86/static/data/response_"+_id+".xml",
+                                   record="true",
+                                   timeout="30")
+		app.logger.debug('Checking voice reminders')
+		if(task['type']=='one-time'):
+			task['state']='done'
+		db.reminders.save(task)
+		return render_template('task_completion.html')
+
 	if task['method']=='email' and task['state']=='active':
 
 		msg = Message('Reminder: '+task['message'], sender = app.config['MAIL_SENDER'], recipients =[task['details']])
