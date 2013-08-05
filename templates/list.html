@@ -191,7 +191,7 @@
           			   <div class="control-group info">
 			            <label class="control-label" for="selectError">Method</label>
 			            <div class="controls">
-			              <select id="method" name="method">
+			              <select id="method" name="method" onchange="method_controller(this)">
 			                <option>Email</option>
 							<option>SMS</option>
 							<option>Voice</option>			                
@@ -209,7 +209,16 @@
 			              
 			            </div>
           			   </div>
-
+          			   <div class="control-group info" id="country-code-controller" style="display:none;">
+			            <label class="control-label" for="selectError">Country Code</label>
+			            <div class="controls">
+			              <select id="country_code" name="country_code">
+			                <option>+001 (for US)</option>
+							<option>+91 (for India)</option>	                
+			              </select>
+			              
+			            </div>
+          			   </div>
           			   <div class="control-group">
 			            <label class="control-label" for="input01">Recipient</label>
 			            <div class="controls">
@@ -278,6 +287,19 @@ if(type=='Monthly')
 
 });
 $('#datepicker').datepicker({minDate:new Date()});
+
+function method_controller(obj)
+{
+	var method=obj.value;
+	if(method=='Email')
+	{
+		$('#country-code-controller').css('display','none');
+	}
+	if(method=='SMS' || type=='Voice')
+	{
+		$('#country-code-controller').css('display','');
+	}
+}
 
 function input_controller(obj)
 {

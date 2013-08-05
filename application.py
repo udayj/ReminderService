@@ -309,12 +309,15 @@ def task_list():
 			task['day_of_month']=int(data['month-type'].lower())
 			task['creator_id']=ObjectId(current_user.id)
 
+			if task['method']=='sms' or task['method']=='voice':
+				task['details']=data['country_code'].split(' ')[0]+task['details']
+
 			_id=db.reminders.save(task)
 			if task['method']=='voice':
 				output_file=codecs.open('static/data/response_'+str(_id)+'.xml','w','utf-8')
 				response='<?xml version="1.0" encoding="UTF-8"?>\
 					<Response>\
-					    <Say voice="male" language="en-IN">'+task['message']+'</Say>\
+					    <Say voice="alice" language="en-IN">'+task['message']+'</Say>\
 					</Response>'
 				output_file.write(response)
 				output_file.close()
@@ -365,7 +368,7 @@ def perform_task():
 		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
 		client = TwilioRestClient(account_sid, auth_token)
 		message = client.sms.messages.create(body=task['message'],
-	    		to="+91"+task['details'],
+	    		to=task['details'],
 				from_="+14157499397")
 
 		
@@ -378,7 +381,7 @@ def perform_task():
 		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
 		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
 		client = TwilioRestClient(account_sid, auth_token)
-		call = client.calls.create(to="+91"+task['details'],  # Any phone number
+		call = client.calls.create(to=task['details'],  # Any phone number
                                   #from_="+16065474465", # Must be a valid Twilio number
                                    from_="+14157499397",
                                    url="http://166.78.236.68:86/static/data/response_"+_id+".xml",
