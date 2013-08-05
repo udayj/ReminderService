@@ -232,6 +232,27 @@ def logout():
 	flash("Logged out!")
 	return redirect(url_for('front'))
 
+@app.route("/task")
+@login_required
+def task():
+	_id=request.args.get('id')
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	try:
+		task=db.reminders.find({'_id':ObjectId(_id)})
+		task=task.next()
+		if task['type']=='one-time':
+			task['timing']=str(task['time'])
+		if task['type']=='daily':
+			task['timing']='Daily at '+task['time'].strftime('%I:%M %p')
+		if task['type']=='weekly':
+			task['timing']='Weekly on '+task['day_of_week'].title()+' at '+task['time'].strftime('%I:%M %p')
+		if task['type']=='monthly':
+			task['timing']='Monthly on - Day of month:'+str(task['day_of_month'])+' at '+task['time'].strftime('%I:%M %p')
+		return render_template('task.html',task=task)
+	except:
+		return render_template('task_error.html')
+
 
 
 @app.route('/task_list',methods=['GET','POST'])
@@ -249,14 +270,12 @@ def task_list():
 		if task['type']=='one-time':
 			task['time_output']=task['time']
 		elif task['type']=='daily':
-			task['time_output']='Daily - '+str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+			task['time_output']='Daily at '+task['time'].strftime('%I:%M %p')
 		elif task['type']=='weekly':
-			task['time_output']='Weekly - every '+str(task['day_of_week']).title()+"  "+\
-								str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+			task['time_output']='Weekly on '+task['day_of_week'].title()+' at '+task['time'].strftime('%I:%M %p')
 		else:
 
-			task['time_output']='Monthly - day '+str(task['day_of_month'])+" of every month "+\
-								str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+			task['time_output']='Monthly on - Day of month:'+str(task['day_of_month'])+' at '+task['time'].strftime('%I:%M %p')
 
 		output.append(task)
 	
@@ -326,14 +345,12 @@ def task_list():
 			if task['type']=='one-time':
 				task['time_output']=task['time']
 			elif task['type']=='daily':
-				task['time_output']='Daily - '+str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+				task['time_output']='Daily at '+task['time'].strftime('%I:%M %p')
 			elif task['type']=='weekly':
-				task['time_output']='Weekly - every '+str(task['day_of_week']).title()+"  "+\
-									str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+				task['time_output']='Weekly on '+task['day_of_week'].title()+' at '+task['time'].strftime('%I:%M %p')
 			else:
 
-				task['time_output']='Monthly - day '+str(task['day_of_month'])+" of every month "+\
-									str(task['time'].hour)+':'+str(task['time'].minute)+':00'
+				task['time_output']='Monthly on - Day of month:'+str(task['day_of_month'])+' at '+task['time'].strftime('%I:%M %p')
 			output.append(task)
 		except Exception as inst:
 			app.logger.debug(inst)

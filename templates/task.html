@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <div class="container">
+        <div class="row">
+          <div class="span9">
+            <table class="table table-bordered table-striped table-hover">
+              <thead>
+                <tr>
+                  <td><b>Field</b></td>
+                  <td><b>Details</b></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Type
+                  </td>
+                  <td>
+                    {{task['type'].title()}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Timing
+                  </td>
+                  <td>
+                    {{task['timing']}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Time-Zone
+                  </td>
+                  <td>
+                    {{task['timezone'].upper()}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Message
+                  </td>
+                  <td>
+                    {{task['message']}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Method
+                  </td>
+                  <td>
+                    {{task['method']}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Recipient
+                  </td>
+                  <td>
+                    {{task['details']}}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="row">
+              <div class="span7">
+                Tasks cannot be edited at this time. However, you can delete a task and create a new task with the correct information.
+                <br>
+              <b><a href="/delete_task?id={{task['_id']}}">Delete this task</a></b>
+            </div>
+            </div>
+          </div>
+      
+      </div>
+    
+      </div>
+      
+<script>
+$('#form').submit(function(){
+      var username=$('#username').val();
+      var email=$('#email').val()
+      var password=$('#password').val();
+      var confirm_password=$('#confirm_password').val();
+      if(email==null || email.trim()=="" || password==null || password.trim()=="" || username==null || username.trim()=="")
+      {
+        alert("Email, password and name cannot be empty");
+        return false;
+
+      }
+      if(password!=confirm_password)
+      {
+        alert("Passwords do not match");
+        return false;
+      }
+      if(password.length<5)
+      {
+        alert("Password should be atleast 5 characters");
+        return false;
+      }
+
+
+    });
+$('#login').submit(function(){
+      var name=$('#name').val();
+  var password=$('#login_password').val();
+  if(name==null || name.trim()=="" || password==null || password.trim()=="")
+  {
+    alert("Email/Username/Password cannot be empty");
+    return false;
+  }
+    });
+  });
+
+
+</script>
+      {% endblock %}

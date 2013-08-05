@@ -23,6 +23,9 @@
 							<td>
 								Delete
 							</td>
+							<td>
+								Details
+							</td>
 						</tr>
 					</thead>
 					{% for task in tasks %}
@@ -40,7 +43,10 @@
 							{{task['method']}}
 						</td>
 						<td>
-							<a href="/delete_task?id={{task['_id']}}">Delete task</a>
+							<a href="/delete_task?id={{task['_id']}}">Delete</a>
+						</td>
+						<td>
+							<a href="/task?id={{task['_id']}}">Details</a>
 						</td>
 					</tr>
 					{% endfor %}
