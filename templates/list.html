@@ -4,7 +4,7 @@
 	<div class="container">
 
 		<div class="row">
-			<div class="span12">
+			<div class="col-lg-12">
 				<table class="table table-bordered table-striped table-hover">
 					<thead>
 						<tr>
@@ -58,25 +58,25 @@
 		<div class="row">
 			
 
-			<div class="span9">
+			<div class="col-lg-9">
 				<div>
 					{{error}}
 				</div>
 				<form class="form-horizontal well" method="post" id="form">
 			        <fieldset>
 			          <legend>Add New Task</legend>
-			          <div class="control-group">
-			            <label class="control-label" for="input01">Message</label>
-			            <div class="controls">
-			              <input type="text" class="input-xlarge" id="message" name="message">
+			          <div class="form-group">
+			            <label class="control-label col-lg-2" for="input01">Message</label>
+			            <div class="col-lg-9">
+			              <input type="text" class="input-xlarge form-control" id="message" name="message">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
 			          
-			          <div class="control-group info">
-			            <label class="control-label">Type</label>
-			            <div class="controls">
-			              <select id="type" name="type" onchange="input_controller(this)">
+			          <div class="form-group info">
+			            <label class="control-label col-lg-2">Type</label>
+			            <div class="col-lg-4">
+			              <select id="type" name="type" class="form-control" onchange="input_controller(this)">
 			                <option>One-Time</option>
 			                <option>Daily</option>
 			                <option>Weekly</option>
@@ -87,18 +87,18 @@
 			            </div>
           			   </div>
 
-          			   <div class="control-group" id="date-controller">
-			            <label class="control-label" for="input01">Date</label>
-			            <div class="controls">
-			              <input type="text" class="input-xlarge" id="datepicker" name="datepicker">
+          			   <div class="form-group" id="date-controller">
+			            <label class="control-label col-lg-2" for="input01">Date</label>
+			            <div class="col-lg-4">
+			              <input type="text" class="input-xlarge form-control" id="datepicker" name="datepicker">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
 
-			          <div class="control-group info" id="day-of-week-controller" style="display:none;">
-			            <label class="control-label">Day Of Week</label>
-			            <div class="controls">
-			              <select id="week-type" name="week-type">
+			          <div class="form-group info" id="day-of-week-controller" style="display:none;">
+			            <label class="control-label col-lg-2">Day Of Week</label>
+			            <div class="col-lg-6">
+			              <select id="week-type" name="week-type" class="form-control" >
 			                <option>Monday</option>
 			                <option>Tuesday</option>
 			                <option>Wednesday</option>
@@ -111,10 +111,10 @@
 			            </div>
           			   </div>
 
-          			   <div class="control-group info" id="day-of-month-controller" style="display:none;">
-			            <label class="control-label">Day Of Month</label>
-			            <div class="controls">
-			              <select id="month-type" name="month-type">
+          			   <div class="form-group info" id="day-of-month-controller" style="display:none;">
+			            <label class="control-label col-lg-2">Day Of Month</label>
+			            <div class="col-lg-4">
+			              <select id="month-type" name="month-type" class="form-control" >
 			                <option>1</option>
 			                <option>2</option>
 			                <option>3</option>
@@ -152,14 +152,14 @@
 			            </div>
           			   </div>
 
-			           <div class="control-group">
-			            <label class="control-label" for="input01">Time</label>
-			            <div class="controls">
-			              <input type="time" id="time" name="time" value="09:00:AM">
+			           <div class="form-group">
+			            <label class="control-label col-lg-2" for="input01">Time</label>
+			            <div class="col-lg-4">
+			              <input type="time" id="time" class="form-control" name="time" value="09:00:AM">
 			              
 			            </div>
 			          </div>
-			          <!--<div class="control-group info">
+			          <!--<div class="form-group info">
 			            <label class="control-label" for="selectError">Time</label>
 			            <div class="controls">
 			              <select id="time" name="time">
@@ -194,10 +194,10 @@
 			              
 			            </div>
           			   </div>-->
-          			   <div class="control-group info">
-			            <label class="control-label" for="selectError">Method</label>
-			            <div class="controls">
-			              <select id="method" name="method" onchange="method_controller(this)">
+          			   <div class="form-group info">
+			            <label class="control-label col-lg-2" for="selectError">Method</label>
+			            <div class="col-lg-4">
+			              <select id="method" name="method" class="form-control" onchange="method_controller(this)">
 			                <option>Email</option>
 							<option>SMS</option>
 							<option>Voice</option>			                
@@ -205,30 +205,30 @@
 			              
 			            </div>
           			   </div>
-          			   <div class="control-group info">
-			            <label class="control-label" for="selectError">Timezone</label>
-			            <div class="controls">
-			              <select id="timezone" name="timezone">
+          			   <div class="form-group info">
+			            <label class="control-label col-lg-2" for="selectError">Timezone</label>
+			            <div class="col-lg-4">
+			              <select id="timezone" name="timezone" class="form-control" >
 			                <option>IST</option>
 							<option>GMT</option>			                
 			              </select>
 			              
 			            </div>
           			   </div>
-          			   <div class="control-group info" id="country-code-controller" style="display:none;">
-			            <label class="control-label" for="selectError">Country Code</label>
-			            <div class="controls">
-			              <select id="country_code" name="country_code">
+          			   <div class="form-group info" id="country-code-controller" style="display:none;">
+			            <label class="control-label col-lg-2" for="selectError">Country Code</label>
+			            <div class="col-lg-6" >
+			              <select id="country_code" name="country_code" class="form-control" >
 			                <option>+001 (for US)</option>
 							<option>+91 (for India)</option>	                
 			              </select>
 			              
 			            </div>
           			   </div>
-          			   <div class="control-group">
-			            <label class="control-label" for="input01">Recipient</label>
-			            <div class="controls">
-			              <input type="text" class="input-xlarge" id="details" name="details">
+          			   <div class="form-group">
+			            <label class="control-label col-lg-2" for="input01">Recipient</label>
+			            <div class="col-lg-8">
+			              <input type="text" class="input-xlarge form-control" id="details" name="details">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
