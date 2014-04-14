@@ -401,7 +401,7 @@ def perform_task():
 		call = client.calls.create(to=task['details'],  # Any phone number
                                   #from_="+16065474465", # Must be a valid Twilio number
                                    from_="+14157499397",
-                                   url="http://166.78.236.68:86/static/data/response_"+_id+".xml",
+                                   url="http://162.243.69.244:86/static/data/response_"+_id+".xml",
                                    method='get',
                                    record="true",
                                    timeout="30")
