@@ -22,7 +22,7 @@ from twilio.rest import TwilioRestClient
 import thread
 import time
 from datetime import datetime,timedelta
-from multiprocessing import Pool
+import multiprocessing
 
 
 SECRET_KEY='SECRET'
@@ -374,6 +374,9 @@ def delete_task():
 
 @app.route('/perform_task')
 def perform_task():
+	def send_mail(msg):
+		mail.send(msg)
+
 	_id=request.args.get('id')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
@@ -416,7 +419,8 @@ def perform_task():
 		msg = Message('Reminder: '+task['message'], sender = app.config['MAIL_SENDER'], recipients =[task['details']])
 
 		msg.body = task['message']
-		mail.send(msg)
+		p=multiprocessing.Process(target=send_mail,args=(msg,))
+		p.start()
 		app.logger.debug('Sending reminder email to:'+task['details'])
 		if(task['type']=='one-time'):
 			task['state']='done'
