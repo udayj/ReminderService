@@ -4,7 +4,7 @@
 	<div class="container">
 
 		<div class="row">
-			<div class="col-lg-12">
+			<div class="col-lg-10 col-md-12">
 				<table class="table table-bordered table-striped table-hover">
 					<thead>
 						<tr>
@@ -58,7 +58,7 @@
 		<div class="row">
 			
 
-			<div class="col-lg-9">
+			<div class="col-lg-9 col-md-9 col-sm-9">
 				<div>
 					{{error}}
 				</div>
@@ -67,15 +67,15 @@
 			          <legend>Add New Task</legend>
 			          <div class="form-group">
 			            <label class="control-label col-lg-2" for="input01">Message</label>
-			            <div class="col-lg-9">
+			            <div class="col-lg-9 col-md-9 col-sm-9">
 			              <input type="text" class="input-xlarge form-control" id="message" name="message">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
 			          
 			          <div class="form-group info">
-			            <label class="control-label col-lg-2">Type</label>
-			            <div class="col-lg-4">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2">Type</label>
+			            <div class="col-lg-4 col-md-4 col-sm-4">
 			              <select id="type" name="type" class="form-control" onchange="input_controller(this)">
 			                <option>One-Time</option>
 			                <option>Daily</option>
@@ -88,16 +88,16 @@
           			   </div>
 
           			   <div class="form-group" id="date-controller">
-			            <label class="control-label col-lg-2" for="input01">Date</label>
-			            <div class="col-lg-4">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="input01">Date</label>
+			            <div class="col-lg-4 col-md-4 col-sm-4">
 			              <input type="text" class="input-xlarge form-control" id="datepicker" name="datepicker">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
 
 			          <div class="form-group info" id="day-of-week-controller" style="display:none;">
-			            <label class="control-label col-lg-2">Day Of Week</label>
-			            <div class="col-lg-6">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2">Day Of Week</label>
+			            <div class="col-lg-6 col-md-6 col-sm-6">
 			              <select id="week-type" name="week-type" class="form-control" >
 			                <option>Monday</option>
 			                <option>Tuesday</option>
@@ -112,8 +112,8 @@
           			   </div>
 
           			   <div class="form-group info" id="day-of-month-controller" style="display:none;">
-			            <label class="control-label col-lg-2">Day Of Month</label>
-			            <div class="col-lg-4">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2">Day Of Month</label>
+			            <div class="col-lg-4 col-md-4 col-sm-4">
 			              <select id="month-type" name="month-type" class="form-control" >
 			                <option>1</option>
 			                <option>2</option>
@@ -153,8 +153,8 @@
           			   </div>
 
 			           <div class="form-group">
-			            <label class="control-label col-lg-2" for="input01">Time</label>
-			            <div class="col-lg-4">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="input01">Time</label>
+			            <div class="col-lg-4 col-md-4 col-sm-4">
 			              <input type="time" id="time" class="form-control" name="time" value="09:00:AM">
 			              
 			            </div>
@@ -195,8 +195,8 @@
 			            </div>
           			   </div>-->
           			   <div class="form-group info">
-			            <label class="control-label col-lg-2" for="selectError">Method</label>
-			            <div class="col-lg-4">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Method</label>
+			            <div class="col-lg-4 col-md-4 col-sm-4">
 			              <select id="method" name="method" class="form-control" onchange="method_controller(this)">
 			                <option>Email</option>
 							<option>SMS</option>
@@ -206,8 +206,8 @@
 			            </div>
           			   </div>
           			   <div class="form-group info">
-			            <label class="control-label col-lg-2" for="selectError">Timezone</label>
-			            <div class="col-lg-4">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Timezone</label>
+			            <div class="col-lg-4 col-md-4 col-sm-4">
 			              <select id="timezone" name="timezone" class="form-control" >
 			                <option>IST</option>
 							<option>GMT</option>			                
@@ -216,8 +216,8 @@
 			            </div>
           			   </div>
           			   <div class="form-group info" id="country-code-controller" style="display:none;">
-			            <label class="control-label col-lg-2" for="selectError">Country Code</label>
-			            <div class="col-lg-6" >
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Country Code</label>
+			            <div class="col-lg-6 col-md-6 col-sm-6" >
 			              <select id="country_code" name="country_code" class="form-control" >
 			                <option>+001 (for US)</option>
 							<option>+91 (for India)</option>	                
@@ -226,8 +226,8 @@
 			            </div>
           			   </div>
           			   <div class="form-group">
-			            <label class="control-label col-lg-2" for="input01">Recipient</label>
-			            <div class="col-lg-8">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="input01">Recipient</label>
+			            <div class="col-lg-8 col-md-8 col-sm-8">
 			              <input type="text" class="input-xlarge form-control" id="details" name="details">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
