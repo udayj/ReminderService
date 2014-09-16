@@ -205,7 +205,7 @@
 			              
 			            </div>
           			   </div>
-          			   <div class="form-group info">
+          			   <!--div class="form-group info">
 			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Timezone</label>
 			            <div class="col-lg-4 col-md-4 col-sm-4">
 			              <select id="timezone" name="timezone" class="form-control" >
@@ -214,8 +214,8 @@
 			              </select>
 			              
 			            </div>
-          			   </div>
-          			   <div class="form-group info" id="country-code-controller" style="display:none;">
+          			   </div-->
+          			   <!--div class="form-group info" id="country-code-controller" style="display:none;">
 			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Country Code</label>
 			            <div class="col-lg-6 col-md-6 col-sm-6" >
 			              <select id="country_code" name="country_code" class="form-control" >
@@ -224,7 +224,7 @@
 			              </select>
 			              
 			            </div>
-          			   </div>
+          			   </div-->
           			   <div class="form-group">
 			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="input01">Recipient</label>
 			            <div class="col-lg-8 col-md-8 col-sm-8">
@@ -299,11 +299,11 @@ function method_controller(obj)
 	var method=obj.value;
 	if(method=='Email')
 	{
-		$('#country-code-controller').css('display','none');
+		//$('#country-code-controller').css('display','none');
 	}
-	if(method=='SMS' || type=='Voice')
+	if(method=='SMS' || method=='Voice')
 	{
-		$('#country-code-controller').css('display','');
+		//$('#country-code-controller').css('display','');
 	}
 }
 

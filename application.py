@@ -107,7 +107,7 @@ def isEqual(task_time,system_time,task_timezone):
 	return True
 
 def validComponents(task):
-	keys=['message','time','timezone','type','method','details','datepicker']
+	keys=['message','time','type','method','details','datepicker']
 	for key in keys:
 		if key not in task:
 			return False
@@ -258,6 +258,8 @@ def task():
 @app.route('/task_list',methods=['GET','POST'])
 @login_required
 def task_list():
+	country_code='+91'
+	timezone='IST'
 	def sorter(task):
 		return task['state']+task['type']+str(task['time'])
 	client=MongoClient()
@@ -320,7 +322,7 @@ def task_list():
 			task['type']=data['type'].lower()
 			task['time']=datetime(year,month,day,hours,minutes)
 			task['state']='active'
-			task['timezone']=data['timezone']
+			task['timezone']=timezone
 			task['method']=data['method'].lower()
 			task['details']=data['details'].lower()
 			task['creator']='admin'
@@ -329,7 +331,7 @@ def task_list():
 			task['creator_id']=ObjectId(current_user.id)
 
 			if task['method']=='sms' or task['method']=='voice':
-				task['details']=data['country_code'].split(' ')[0]+task['details']
+				task['details']=country_code+task['details']
 
 			_id=db.reminders.save(task)
 			if task['method']=='voice':
