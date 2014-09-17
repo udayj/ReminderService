@@ -4,7 +4,7 @@
 	<div class="container">
 
 		<div class="row">
-			<div class="col-lg-10 col-md-12">
+			<div class="col-lg-12 col-md-12">
 				<table class="table table-bordered table-striped table-hover">
 					<thead>
 						<tr>
@@ -34,7 +34,11 @@
 							{{task['state']}}
 						</td>
 						<td>
-							{{task['message']}}
+							{% if 'subject' in task %}
+							{{task['subject']|safe}}
+							{% else %}
+							{{task['message']|safe}}
+							{% endif %}
 						</td>
 						<td>
 							{{task['time_output']}}
@@ -57,18 +61,53 @@
 		
 		<div class="row">
 			
-
-			<div class="col-lg-9 col-md-9 col-sm-9">
+			<div class="col-lg-9 col-md-9 col-sm-12">
 				<div>
 					{{error}}
 				</div>
-				<form class="form-horizontal well" method="post" id="form">
+				<form class="form-horizontal well" method="post" id="form" enctype="multipart/form-data">
 			        <fieldset>
 			          <legend>Add New Task</legend>
-			          <div class="form-group">
+
+			          <div class="form-group info">
+			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Method</label>
+			            <div class="col-lg-4 col-md-4 col-sm-4">
+			              <select id="method" name="method" class="form-control" onchange="method_controller(this)">
+			                <option>Email</option>
+							<option>SMS</option>
+							<option>Voice</option>			                
+			              </select>
+			              
+			            </div>
+          			   </div>
+
+          			  <div class="form-group" id="subject-message-controller">
+			            <label class="control-label col-lg-2" for="input01">Subject</label>
+			            <div class="col-lg-9 col-md-9 col-sm-9">
+			              <input type="text" class="input-xlarge form-control" id="subject" name="subject">
+			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
+			            </div>
+			          </div>
+
+			          <div class="form-group" style="display:none" id="sms-message-controller">
 			            <label class="control-label col-lg-2" for="input01">Message</label>
 			            <div class="col-lg-9 col-md-9 col-sm-9">
-			              <input type="text" class="input-xlarge form-control" id="message" name="message">
+			              <input type="text" class="input-xlarge form-control" id="sms_message" name="sms_message">
+			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
+			            </div>
+			          </div>
+			          <div class="form-group" id="email-message-controller">
+			            <label class="control-label col-lg-2" for="input01">Message</label>
+			            <div class="col-lg-9 col-md-9 col-sm-9">
+			              <textarea class="input-xlarge form-control" id="message" name="message" style="display:inline;margin:0px"></textarea>
+
+			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
+			            </div>
+			          </div>
+			          <div class="form-group" id="attachment-controller">
+			            <label class="control-label col-lg-2" for="input01">Attachment</label>
+			            <div class="col-lg-6 col-md-6 col-sm-6">
+			              <input type="file" class="form-control" id="attachment" name="attachment">
 			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
 			            </div>
 			          </div>
@@ -194,17 +233,7 @@
 			              
 			            </div>
           			   </div>-->
-          			   <div class="form-group info">
-			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Method</label>
-			            <div class="col-lg-4 col-md-4 col-sm-4">
-			              <select id="method" name="method" class="form-control" onchange="method_controller(this)">
-			                <option>Email</option>
-							<option>SMS</option>
-							<option>Voice</option>			                
-			              </select>
-			              
-			            </div>
-          			   </div>
+          			   
           			   <!--div class="form-group info">
 			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="selectError">Timezone</label>
 			            <div class="col-lg-4 col-md-4 col-sm-4">
@@ -245,13 +274,23 @@
 	</div>
 <script>
 
+$("textarea").jqte({format:false});
+$('.jqte').css('margin','0px');
+
 $('#form').submit(function(){
+
 
 var message=$('#message').val();
 var date=$('#datepicker').val();
 var recipients=$('#details').val();
 var time=$('#time').val();
 var type=$('#type').val();
+
+if($('#method').val()=='SMS' || $('#method').val()=='Voice')
+{
+	message=$('#sms_message').val();
+	$('#message').val(message);
+}
 
 
 if(type=='One-Time')
@@ -299,10 +338,18 @@ function method_controller(obj)
 	var method=obj.value;
 	if(method=='Email')
 	{
+		$('#email-message-controller').css('display','');
+		$('#sms-message-controller').css('display','none');
+		$('#subject-message-controller').css('display','');
+		$('#attachment-controller').css('display','');
 		//$('#country-code-controller').css('display','none');
 	}
 	if(method=='SMS' || method=='Voice')
 	{
+		$('#sms-message-controller').css('display','');
+		$('#email-message-controller').css('display','none');
+		$('#subject-message-controller').css('display','none');
+		$('#attachment-controller').css('display','none');
 		//$('#country-code-controller').css('display','');
 	}
 }

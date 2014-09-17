@@ -23,7 +23,8 @@ import thread
 import time
 from datetime import datetime,timedelta
 import multiprocessing
-
+from werkzeug import secure_filename
+import os
 
 SECRET_KEY='SECRET'
 
@@ -39,6 +40,9 @@ login_manager.login_view = "login"
 login_manager.login_message = u"Please log in to access this page."
 
 mail=Mail(app)
+UPLOAD_FOLDER = 'static/data'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'doc', 'xlsx','docx'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 class User(UserMixin):
     def __init__(self, name, _id, password,email,activation_hash=None,active=True):
@@ -83,6 +87,9 @@ def admin():
 	else:
 		return redirect(url_for('front'))		
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 def isEqual(task_time,system_time,task_timezone):
 	components=['year','month','day','hour','minute']
@@ -319,6 +326,11 @@ def task_list():
 
 			minutes=int(time_components[1])
 			task['message']=data['message']
+			if('subject' in data and data['method'].lower()=='email'):
+				task['subject']=data['subject']
+			
+
+			app.logger.debug('reminder message:'+task['message'])
 			task['type']=data['type'].lower()
 			task['time']=datetime(year,month,day,hours,minutes)
 			task['state']='active'
@@ -334,7 +346,19 @@ def task_list():
 				task['details']=country_code+task['details']
 
 			_id=db.reminders.save(task)
+			task['_id']=_id
+			attachment=request.files['attachment']
+			if attachment:
+				if allowed_file(attachment.filename):
+					attachment_name='attachment_'+str(_id)+'.'+attachment.filename.rsplit('.', 1)[1]
+					attachment.save(os.path.join(app.config['UPLOAD_FOLDER'],attachment_name))
+					task['attachment']=os.path.join(app.config['UPLOAD_FOLDER'],attachment_name)
+					task['attachment_name']=attachment_name
+					db.reminders.save(task)
+
+
 			if task['method']=='voice':
+				task['voice_response']=os.path.join(app.config['UPLOAD_FOLDER'],'response_'+str(_id)+'.xml')
 				output_file=codecs.open('static/data/response_'+str(_id)+'.xml','w','utf-8')
 				response='<?xml version="1.0" encoding="UTF-8"?>\
 					<Response>\
@@ -342,6 +366,7 @@ def task_list():
 					</Response>'
 				output_file.write(response)
 				output_file.close()
+				db.reminders.save(task)
 
 			task['time_output']=''
 			if task['type']=='one-time':
@@ -403,10 +428,15 @@ def perform_task():
 		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
 		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
 		client = TwilioRestClient(account_sid, auth_token)
+		response_file=''
+		if ('voice_response' in task):
+			response_file=task['voice_response']
+		else:
+			response_file="static/data/response_"+_id+".xml"
 		call = client.calls.create(to=task['details'],  # Any phone number
                                   #from_="+16065474465", # Must be a valid Twilio number
                                    from_="+14157499397",
-                                   url="http://162.243.69.244:86/static/data/response_"+_id+".xml",
+                                   url="http://162.243.69.244:86/"+response_file,
                                    method='get',
                                    record="true",
                                    timeout="30")
@@ -418,9 +448,15 @@ def perform_task():
 
 	if task['method']=='email' and task['state']=='active':
 
-		msg = Message('Reminder: '+task['message'], sender = app.config['MAIL_SENDER'], recipients =[task['details']])
+		subject='Reminder: '+task['message']
+		if('subject' in task):
+			subject=task['subject']
+		msg = Message(subject,body=task['message'],html=task['message'], sender = app.config['MAIL_SENDER'], recipients =[task['details']])
 
 		msg.body = task['message']
+		if ('attachment' in task):
+			with app.open_resource('./'+task['attachment']) as fp:
+				msg.attach(filename=task['attachment_name'],content_type='application/octet-stream',data=fp.read())
 		p=multiprocessing.Process(target=send_mail,args=(msg,))
 		p.start()
 		app.logger.debug('Sending reminder email to:'+task['details'])

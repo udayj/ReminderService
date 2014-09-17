@@ -34,10 +34,25 @@
                   </td>
                 </tr>
                 <tr>
+                   {% if 'subject' in task %}
+                  <td>Subject
+                  </td>
+                  <td>
+                   
+              {{task['subject']|safe}}
+              
+              
+              
+                  </td>
+                </tr>
+                {% endif %}
+                <tr>
                   <td>Message
                   </td>
                   <td>
-                    {{task['message']}}
+              
+              {{task['message']|safe}}
+            
                   </td>
                 </tr>
                 <tr>
