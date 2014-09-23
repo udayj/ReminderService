@@ -26,9 +26,9 @@
                     {{task['timing']}}
                   </td>
                 </tr>
-                
+                {% if 'subject' in task %}
                 <tr>
-                   {% if 'subject' in task %}
+                   
                   <td>Subject
                   </td>
                   <td>
@@ -41,6 +41,7 @@
                 </tr>
                 {% endif %}
                 <tr>
+                  
                   <td>Message
                   </td>
                   <td>
