@@ -1,0 +1,9 @@
+.table-striped > tbody > tr > td.method-email {
+	background-color:rgb(197,188,80)
+}
+.table-striped > tbody > tr > td.method-sms {
+	background-color:rgb(223,158,38)
+}
+.table-striped > tbody > tr > td.method-voice {
+	background-color:rgb(24,216,237)
+}

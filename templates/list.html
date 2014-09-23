@@ -5,7 +5,7 @@
 
 		<div class="row">
 			<div class="col-lg-12 col-md-12">
-				<table class="table table-bordered table-striped table-hover">
+				<table id="task-table" class="table table-bordered table-striped table-hover tablesorter">
 					<thead>
 						<tr>
 							<td>
@@ -28,6 +28,7 @@
 							</td>
 						</tr>
 					</thead>
+					<tbody>
 					{% for task in tasks %}
 					<tr style="font-size:14px;">
 						<td>
@@ -54,7 +55,7 @@
 						</td>
 					</tr>
 					{% endfor %}
-
+					</tbody>
 				</table>
 			</div>
 		</div>
@@ -272,10 +273,15 @@
 		</div>
 
 	</div>
+
 <script>
 
 $("textarea").jqte({format:false});
 $('.jqte').css('margin','0px');
+
+
+
+
 
 $('#form').submit(function(){
 
@@ -383,5 +389,6 @@ function input_controller(obj)
 	}
 
 }
+
 </script>
 {% endblock %}

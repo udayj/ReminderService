@@ -26,13 +26,7 @@
                     {{task['timing']}}
                   </td>
                 </tr>
-                <tr>
-                  <td>Time-Zone
-                  </td>
-                  <td>
-                    {{task['timezone'].upper()}}
-                  </td>
-                </tr>
+                
                 <tr>
                    {% if 'subject' in task %}
                   <td>Subject
@@ -69,6 +63,13 @@
                     {{task['details']}}
                   </td>
                 </tr>
+                 <tr>
+                  <td>Status
+                  </td>
+                  <td>
+                    {{task['state']}}
+                  </td>
+                </tr>
               </tbody>
             </table>
             <div class="row">
@@ -81,7 +82,51 @@
           </div>
       
       </div>
-    
+      {% if sub_tasks|length > 0 %}
+      <div class="row">
+      <div class="col-lg-6 col-md-6">
+        <h3>Status Details</h3>
+      </div>
+    </div>
+        <div class="row">
+      <div class="col-lg-6 col-md-6">
+        <table id="status-table" class="table table-bordered table-striped table-hover tablesorter">
+          <thead>
+            <tr>
+              <td>
+                Task Time
+              </td>
+              
+              <td>
+                Method
+              </td>
+
+              <td>
+                Status
+              </td>
+              
+            </tr>
+          </thead>
+          <tbody>
+          {% for sub_task in sub_tasks %}
+          <tr style="font-size:14px;">
+            <td>
+              {{sub_task['time']}}
+            </td>
+            <td>
+              {{sub_task['method']}}
+            <td>
+              {{sub_task['status']}}
+            </td>
+            
+           
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
       </div>
       
 <script>

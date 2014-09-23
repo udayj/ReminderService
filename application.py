@@ -242,6 +242,8 @@ def logout():
 @app.route("/task")
 @login_required
 def task():
+	suffix=['st','nd','rd','th','th','th','th','th','th','th','th','th','th','th','th','th','th','th','th',
+			'th','st','nd','rd','th','th','th','th','th','th','th','st']
 	_id=request.args.get('id')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
@@ -249,14 +251,27 @@ def task():
 		task=db.reminders.find({'_id':ObjectId(_id)})
 		task=task.next()
 		if task['type']=='one-time':
-			task['timing']=str(task['time'])
+			task['timing']='Once at '+task['time'].strftime('%b %d, %Y %I:%M %p')
 		if task['type']=='daily':
 			task['timing']='Daily at '+task['time'].strftime('%I:%M %p')
 		if task['type']=='weekly':
 			task['timing']='Weekly on '+task['day_of_week'].title()+' at '+task['time'].strftime('%I:%M %p')
 		if task['type']=='monthly':
-			task['timing']='Monthly on - Day of month:'+str(task['day_of_month'])+' at '+task['time'].strftime('%I:%M %p')
-		return render_template('task.html',task=task)
+			task['timing']='Monthly on - '+str(task['day_of_month'])+suffix[task['day_of_month']-1] +' day at ' +\
+								task['time'].strftime('%I:%M %p')
+
+		app.logger.debug('inside task function')
+		display_sub_tasks=[]
+		for sub_task in db.status.find({'task_id':ObjectId(_id)}):
+			
+			if(sub_task==None):
+				break
+
+			display_sub_tasks.append({'time':task['time'].strftime('%b %d, %Y %I:%M %p'),'status':sub_task['status'],
+				'method':task['method']})
+
+		app.logger.debug('inside task function - after aggregating tasks')
+		return render_template('task.html',task=task,sub_tasks=display_sub_tasks)
 	except:
 		return render_template('task_error.html')
 
@@ -265,10 +280,17 @@ def task():
 @app.route('/task_list',methods=['GET','POST'])
 @login_required
 def task_list():
+	suffix=['st','nd','rd','th','th','th','th','th','th','th','th','th','th','th','th','th','th','th','th',
+			'th','st','nd','rd','th','th','th','th','th','th','th','st']
 	country_code='+91'
 	timezone='IST'
 	def sorter(task):
-		return task['state']+task['type']+str(task['time'])
+		if('creation_time' in task):
+			epoch=datetime.utcfromtimestamp(0)
+			delta=task['creation_time']-epoch
+			return task['state']+str(1000000000000-delta.total_seconds())+task['type']+str(task['time'])
+		else:
+			return task['state']+task['type']+str(task['time'])
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	_id=current_user.id
@@ -277,14 +299,16 @@ def task_list():
 	for task in tasks:
 		task['time_output']=''
 		if task['type']=='one-time':
-			task['time_output']=task['time']
+			task['time_output']='Once at '+task['time'].strftime('%b %d, %Y %I:%M %p')
 		elif task['type']=='daily':
 			task['time_output']='Daily at '+task['time'].strftime('%I:%M %p')
 		elif task['type']=='weekly':
 			task['time_output']='Weekly on '+task['day_of_week'].title()+' at '+task['time'].strftime('%I:%M %p')
 		else:
 
-			task['time_output']='Monthly on - Day of month:'+str(task['day_of_month'])+' at '+task['time'].strftime('%I:%M %p')
+			task['time_output']='Monthly on - '+str(task['day_of_month'])+suffix[task['day_of_month']-1] +' day at ' +\
+								task['time'].strftime('%I:%M %p')
+
 
 		output.append(task)
 	
@@ -341,6 +365,7 @@ def task_list():
 			task['day_of_week']=data['week-type'].lower()
 			task['day_of_month']=int(data['month-type'].lower())
 			task['creator_id']=ObjectId(current_user.id)
+			task['creation_time']=datetime.now()
 
 			if task['method']=='sms' or task['method']=='voice':
 				task['details']=country_code+task['details']
@@ -370,14 +395,15 @@ def task_list():
 
 			task['time_output']=''
 			if task['type']=='one-time':
-				task['time_output']=task['time']
+				task['time_output']='Once at '+task['time'].strftime('%b %d, %Y %I:%M %p')
 			elif task['type']=='daily':
 				task['time_output']='Daily at '+task['time'].strftime('%I:%M %p')
 			elif task['type']=='weekly':
 				task['time_output']='Weekly on '+task['day_of_week'].title()+' at '+task['time'].strftime('%I:%M %p')
 			else:
 
-				task['time_output']='Monthly on - Day of month:'+str(task['day_of_month'])+' at '+task['time'].strftime('%I:%M %p')
+				task['time_output']='Monthly on - '+str(task['day_of_month'])+suffix[task['day_of_month']-1] +' day at ' +\
+								task['time'].strftime('%I:%M %p')
 			output.append(task)
 		except Exception as inst:
 			app.logger.debug(inst)
@@ -410,6 +436,34 @@ def perform_task():
 	app.logger.debug(_id)
 	task=db.reminders.find({'_id':ObjectId(_id)})
 	task=task.next()
+	timezone='IST'
+	if task['method']=='http' and task['state']=='active':
+		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
+		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
+		client = TwilioRestClient(account_sid, auth_token)
+		if ('sms_id' in task):
+
+			message=client.sms.messages.get(task['sms_id'])
+			task_status_id=task['details']
+			reminder_task=db.status.find({'_id':task_status_id})
+			reminder_task=reminder_task.next()
+			reminder_task['status']=message.status
+			db.status.save(reminder_task)
+
+			task['state']='done'
+			db.reminders.save(task)
+
+		if('call_id' in task):
+			call=client.calls.get(task['call_id'])
+			task_status_id=task['details']
+			reminder_task=db.status.find({'_id':task_status_id})
+			reminder_task=reminder_task.next()
+			reminder_task['status']=call.status
+			db.status.save(reminder_task)
+			task['state']='done'
+			db.reminders.save(task)
+
+
 	if task['method']=='sms' and task['state']=='active':
 		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
 		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
@@ -421,6 +475,30 @@ def perform_task():
 		
 		if(task['type']=='one-time'):
 			task['state']='done'
+		task_status={}
+		task_status['task_id']=task['_id']
+		task_status['method']=task['method']
+		task_status['time_performed']=datetime.now()
+		task_status['status']='not available'
+		task_status['sms_id']=message.sid
+		task_status_id=db.status.save(task_status)
+
+		url_task={}
+		url_task['type']='status'
+		url_task['time']=task['time']+timedelta(minutes=2)
+		url_task['state']='active'
+		url_task['timezone']='IST'
+		url_task['method']='http'
+		url_task['details']=task_status_id
+		url_task['creator']='admin'
+		url_task['day_of_week']=1
+		url_task['day_of_month']=1
+		url_task['creator_id']='admin'
+		url_task['creation_time']=datetime.now()
+		url_task['sms_id']=message.sid
+
+
+		db.reminders.save(url_task)
 		db.reminders.save(task)
 		return render_template('task_completion.html')	
 
@@ -443,6 +521,29 @@ def perform_task():
 		app.logger.debug('Checking voice reminders')
 		if(task['type']=='one-time'):
 			task['state']='done'
+		task_status={}
+		task_status['task_id']=task['_id']
+		task_status['method']=task['method']
+		task_status['time_performed']=datetime.now()
+		task_status['status']='not available'
+		task_status['call_id']=call.sid
+		task_status_id=db.status.save(task_status)
+
+		url_task={}
+		url_task['type']='status'
+		url_task['time']=task['time']+timedelta(minutes=2)
+		url_task['state']='active'
+		url_task['timezone']='IST'
+		url_task['method']='http'
+		url_task['details']=task_status_id
+		url_task['creator']='admin'
+		url_task['day_of_week']=1
+		url_task['day_of_month']=1
+		url_task['creator_id']='admin'
+		url_task['creation_time']=datetime.now()
+		url_task['call_id']=call.sid
+
+		db.reminders.save(url_task)
 		db.reminders.save(task)
 		return render_template('task_completion.html')
 
@@ -462,6 +563,14 @@ def perform_task():
 		app.logger.debug('Sending reminder email to:'+task['details'])
 		if(task['type']=='one-time'):
 			task['state']='done'
+		task_status={}
+		task_status['task_id']=task['_id']
+		task_status['type']=task['type']
+		task_status['time_performed']=datetime.now()
+		task_status['status']='sent'
+		db.status.save(task_status)
+
+
 		db.reminders.save(task)
 		return render_template('task_completion.html')
 	else:
