@@ -487,7 +487,7 @@ def perform_task():
 
 		url_task={}
 		url_task['type']='one-time'
-		url_task['time']=task['time']+timedelta(minutes=2)
+		url_task['time']=datetime.now()+timedelta(hours=9,minutes=32)
 		url_task['state']='active'
 		url_task['timezone']='IST'
 		url_task['method']='http'
@@ -534,7 +534,7 @@ def perform_task():
 
 		url_task={}
 		url_task['type']='one-time'
-		url_task['time']=task['time']+timedelta(minutes=2)
+		url_task['time']=datetime.now()+timedelta(hours=9,minutes=32)
 		url_task['state']='active'
 		url_task['timezone']='IST'
 		url_task['method']='http'
