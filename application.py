@@ -480,7 +480,7 @@ def perform_task():
 		task_status['task_id']=task['_id']
 		task_status['method']=task['method']
 		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
-		task_status['status']='not available'
+		task_status['status']='-'
 		task_status['sms_id']=message.sid
 		
 		task_status_id=db.status.save(task_status)
@@ -528,7 +528,7 @@ def perform_task():
 		task_status['task_id']=task['_id']
 		task_status['method']=task['method']
 		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
-		task_status['status']='not available'
+		task_status['status']='-'
 		task_status['call_id']=call.sid
 		
 		task_status_id=db.status.save(task_status)
