@@ -491,6 +491,7 @@ def perform_task():
 		url_task['state']='active'
 		url_task['timezone']='IST'
 		url_task['method']='http'
+		url_task['message']='http task'
 		url_task['details']=task_status_id
 		url_task['creator']='admin'
 		url_task['day_of_week']=1
@@ -538,6 +539,7 @@ def perform_task():
 		url_task['state']='active'
 		url_task['timezone']='IST'
 		url_task['method']='http'
+		url_task['message']='http task'
 		url_task['details']=task_status_id
 		url_task['creator']='admin'
 		url_task['day_of_week']=1
