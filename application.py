@@ -267,7 +267,7 @@ def task():
 			if(sub_task==None):
 				break
 
-			display_sub_tasks.append({'time':task['time'].strftime('%b %d, %Y %I:%M %p'),'status':sub_task['status'],
+			display_sub_tasks.append({'time':sub_task['time_performed'].strftime('%b %d, %Y %I:%M %p'),'status':sub_task['status'],
 				'method':task['method']})
 
 		app.logger.debug('inside task function - after aggregating tasks')
@@ -448,6 +448,7 @@ def perform_task():
 			reminder_task=db.status.find({'_id':task_status_id})
 			reminder_task=reminder_task.next()
 			reminder_task['status']=message.status
+
 			db.status.save(reminder_task)
 
 			task['state']='done'
@@ -478,13 +479,14 @@ def perform_task():
 		task_status={}
 		task_status['task_id']=task['_id']
 		task_status['method']=task['method']
-		task_status['time_performed']=datetime.now()
+		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
 		task_status['status']='not available'
 		task_status['sms_id']=message.sid
+		
 		task_status_id=db.status.save(task_status)
 
 		url_task={}
-		url_task['type']='status'
+		url_task['type']='one-time'
 		url_task['time']=task['time']+timedelta(minutes=2)
 		url_task['state']='active'
 		url_task['timezone']='IST'
@@ -524,13 +526,14 @@ def perform_task():
 		task_status={}
 		task_status['task_id']=task['_id']
 		task_status['method']=task['method']
-		task_status['time_performed']=datetime.now()
+		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
 		task_status['status']='not available'
 		task_status['call_id']=call.sid
+		
 		task_status_id=db.status.save(task_status)
 
 		url_task={}
-		url_task['type']='status'
+		url_task['type']='one-time'
 		url_task['time']=task['time']+timedelta(minutes=2)
 		url_task['state']='active'
 		url_task['timezone']='IST'
