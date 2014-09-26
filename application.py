@@ -525,7 +525,7 @@ def perform_task():
 		call = client.calls.create(to=task['details'],  # Any phone number
                                   #from_="+16065474465", # Must be a valid Twilio number
                                    from_="+14157499397",
-                                   url=HOST+'/'+response_file,
+                                   url=app.config['HOST']+'/'+response_file,
                                    method='get',
                                    record="true",
                                    timeout="30")
