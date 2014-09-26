@@ -41,7 +41,7 @@
                 </tr>
                 {% endif %}
                 <tr>
-                  
+
                   <td>Message
                   </td>
                   <td>
@@ -50,6 +50,20 @@
             
                   </td>
                 </tr>
+                {% if 'attachment_original_name' in task %}
+                <tr>
+                   
+                  <td>Attachment
+                  </td>
+                  <td>
+                   
+              {{task['attachment_original_name']|safe}}
+              
+              
+              
+                  </td>
+                </tr>
+                {% endif %}
                 <tr>
                   <td>Method
                   </td>

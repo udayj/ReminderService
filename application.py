@@ -40,9 +40,10 @@ login_manager.login_view = "login"
 login_manager.login_message = u"Please log in to access this page."
 
 mail=Mail(app)
-UPLOAD_FOLDER = 'static/data'
+UPLOAD_FOLDER = app.config['UPLOAD_FOLDER']
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'xls', 'doc', 'xlsx','docx'])
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+ACCOUNT_SID=app.config['ACCOUNT_SID']
+AUTH_TOKEN=app.config['AUTH_TOKEN']
 
 class User(UserMixin):
     def __init__(self, name, _id, password,email,activation_hash=None,active=True):
@@ -62,6 +63,12 @@ def front():
 	
 	return render_template('front.html',active='front')
 
+@app.route('/new_task')
+@login_required
+def new_task():
+	
+	return render_template('new_task.html',active='new_task')
+
 @app.route('/new_user_task')
 def new_user_task():
 	
@@ -73,7 +80,7 @@ def admin():
 		return task['state']+str(task['time'])
 
 	password=request.args.get('password')
-	if password=='password':
+	if password==ADMIN_PASSWORD:
 
 		client=MongoClient()
 		db=client[app.config['DATABASE']]
@@ -379,6 +386,7 @@ def task_list():
 					attachment.save(os.path.join(app.config['UPLOAD_FOLDER'],attachment_name))
 					task['attachment']=os.path.join(app.config['UPLOAD_FOLDER'],attachment_name)
 					task['attachment_name']=attachment_name
+					task['attachment_original_name']=attachment.filename
 					db.reminders.save(task)
 
 
@@ -438,8 +446,8 @@ def perform_task():
 	task=task.next()
 	timezone='IST'
 	if task['method']=='http' and task['state']=='active':
-		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
-		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
+		account_sid = ACCOUNT_SID
+		auth_token = AUTH_TOKEN
 		client = TwilioRestClient(account_sid, auth_token)
 		if ('sms_id' in task):
 
@@ -466,8 +474,8 @@ def perform_task():
 
 
 	if task['method']=='sms' and task['state']=='active':
-		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
-		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
+		account_sid = ACCOUNT_SID
+		auth_token = AUTH_TOKEN
 		client = TwilioRestClient(account_sid, auth_token)
 		message = client.sms.messages.create(body=task['message'],
 	    		to=task['details'],
@@ -506,8 +514,8 @@ def perform_task():
 		return render_template('task_completion.html')	
 
 	if task['method']=='voice' and task['state']=='active':
-		account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
-		auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
+		account_sid = ACCOUNT_SID
+		auth_token = AUTH_TOKEN
 		client = TwilioRestClient(account_sid, auth_token)
 		response_file=''
 		if ('voice_response' in task):
@@ -517,7 +525,7 @@ def perform_task():
 		call = client.calls.create(to=task['details'],  # Any phone number
                                   #from_="+16065474465", # Must be a valid Twilio number
                                    from_="+14157499397",
-                                   url="http://162.243.69.244:86/"+response_file,
+                                   url=HOST+'/'+response_file,
                                    method='get',
                                    record="true",
                                    timeout="30")
