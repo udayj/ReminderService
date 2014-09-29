@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!--
 <div class="container">
         <div class="row">
           <div class="col-md-9">
@@ -33,5 +34,160 @@
       </div>
       
 
+    </div> -->
+
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Remindica</h1>
+      <p> Your personal virtual assistant in the cloud. </p>
     </div>
+    <div class="row">
+      <div class="col-lg-9">
+        <h4>
+          What does it do ?
+        </h4>
+        <h5>
+          Our state of the art technology helps you automate the mundane but important tasks in your business. You can use our simple and cost effective reminder service to remember important issues of your business. People routinely use our service for tasks such as reminding their clients of payment due dates, setting appointment reminders, reminding themselves of tax filing due dates, reminding themselves of an important upcoming meeting, reminding customers of service due dates. Some companies also use the service to streamline their internal operations.<br>
+          Reminders can be sent on email, SMS or through a voice phone call - depending on your choice.
+        </h5>
+        <h4> Who are your customers ? </h4>
+        <h5>
+          Hundreds of businesses are harnessing the power of our technology to become more productive and effective at work. We routinely process more than 100000 reminders daily.
+        </h5>
+        <h4> Pricing </h4>
+        <h5>
+          We have an incredibly affordable pricing for the state of the art technology we provide. We want to provide businesses worldwide with the power to communicate more effectively.
+        </h5>
+      </div>
+    </div>
+  </div>
+  {% if not current_user.email %}
+
+  <div class="container">
+        <div class="row">
+          <div class="col-lg-9">
+          <h4> Get Started </h4>
+        </div>
+          <div class="col-lg-7 col-md-7">
+
+           
+           <div class="row">
+            <div class="col-lg-12 col-md-12">
+              <div>{{signup_error}}</div>
+           <form id="form" class="form-horizontal" action="/signup" method="post">
+            <fieldset>
+              <legend>Create a new account here</legend>
+              <div class="form-group">
+                
+                  <label class="control-label col-lg-2 col-md-2" for="email">Email Id </label>
+                  <div class="col-lg-8 col-md-8">
+                  <input type="text" id="email"  class="form-control" name="email" placeholder="{{email}}" value="{{email}}">
+                  </div>
+              </div>
+              <div class="form-group">
+                
+                  <label class="control-label col-lg-2 col-md-2" for="username" >Name</label>
+                  <div class="col-lg-8 col-md-8">
+                  <input type="text" id="username" class="form-control" name="username" placeholder="{{username}}" value="{{username}}">
+                  
+                </div>
+              </div>
+              <div class="form-group">
+                
+                  <label class="control-label col-lg-2 col-md-2" for="password">Password</label>
+                  <div class="col-lg-8 col-md-8">
+                  <input type="password" id="password" class="form-control" name="password">
+                  <p class="help-block">Should be atleast 5 characters</p>
+                </div>
+              </div>
+              <div class="form-group">
+                
+                  <label class="control-label col-lg-2 col-md-2" for="confirm_password">Confirm Password</label>
+                  <div class="col-lg-8 col-md-8">
+                  <input type="password" id="confirm_password" class="form-control" name="confirm_password">
+                  
+                </div>
+              </div>
+              <div class="form-actions">
+                <center>
+                <input type="submit" class="btn btn-primary"></input>
+              </center>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+        <div class="col-lg-5" style="position:relative;">
+          <div>{{error}}</div>
+          <form class="form-horizontal" action="/login" method="post" id="login">
+            <fieldset>
+              <legend>Already a member? Login below</legend>
+              
+                               
+                  <div class="form-group">
+                    <label class="control-label col-lg-3 col-md-3" for="name">Email Id </label>
+                    <div class="col-lg-9 col-md-9">
+                  <input type="text" id="name" class="form-control" name="username" placeholder="Email">
+                </div>
+                   </div>            
+                  
+                  <div class="form-group">
+                    <label class="control-label col-lg-3 col-md-3" for="login_password">Password</label>
+                    <div class="col-lg-9 col-md-9">
+                  <input type="password" id="login_password" class="form-control" name="password" placeholder="Password" onkeydown="if (event.keyCode==19) { document.getElementById('login_submit').focus();}">
+                </div>
+                </div>
+                  <center>
+                  <button id="login_submit" type="submit" class="btn btn-primary" style="margin-bottom:0px;">Submit</button>
+                  </center>
+                
+              
+            </fieldset>
+          </form>
+        </div>
+      
+      </div>
+    
+      </div>
+      {% endif %}
+      
+<script>
+$('#form').submit(function(){
+      var username=$('#username').val();
+      var email=$('#email').val()
+      var password=$('#password').val();
+      var confirm_password=$('#confirm_password').val();
+      if(email==null || email.trim()=="" || password==null || password.trim()=="" || username==null || username.trim()=="")
+      {
+        alert("Email, password and name cannot be empty");
+        return false;
+
+      }
+      if(password!=confirm_password)
+      {
+        alert("Passwords do not match");
+        return false;
+      }
+      if(password.length<5)
+      {
+        alert("Password should be atleast 5 characters");
+        return false;
+      }
+
+
+    });
+$('#login').submit(function(){
+      var name=$('#name').val();
+  var password=$('#login_password').val();
+  if(name==null || name.trim()=="" || password==null || password.trim()=="")
+  {
+    alert("Email/Username/Password cannot be empty");
+    return false;
+  }
+    });
+  });
+
+
+</script>
 {% endblock %}
