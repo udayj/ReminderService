@@ -80,7 +80,7 @@ def admin():
 		return task['state']+str(task['time'])
 
 	password=request.args.get('password')
-	if password==ADMIN_PASSWORD:
+	if password==app.config['ADMIN_PASSWORD']:
 
 		client=MongoClient()
 		db=client[app.config['DATABASE']]
