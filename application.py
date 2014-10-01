@@ -249,11 +249,29 @@ def logout():
 @app.route("/task")
 @login_required
 def task():
+	def sorter(task):
+		if('time_performed' in task):
+			epoch=datetime.utcfromtimestamp(0)
+			delta=task['time_performed']-epoch
+			return 10000000000000-delta.total_seconds()
+		else:
+			return 1
 	suffix=['st','nd','rd','th','th','th','th','th','th','th','th','th','th','th','th','th','th','th','th',
 			'th','st','nd','rd','th','th','th','th','th','th','th','st']
 	_id=request.args.get('id')
+	instant=request.args.get('instant')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
+
+	if instant=='true':
+		task=db.reminders.find({'_id':ObjectId(_id)})
+		task=task.next()
+		if str(task['creator_id'])==current_user.id:
+			result=task_worker(_id,True)
+			if result!=1:
+				app.logger.error('ERROR in performing task: '+_id)
+
+	
 	try:
 		task=db.reminders.find({'_id':ObjectId(_id)})
 		task=task.next()
@@ -269,7 +287,16 @@ def task():
 
 		app.logger.debug('inside task function')
 		display_sub_tasks=[]
+		intermediate_sub_tasks=[]
 		for sub_task in db.status.find({'task_id':ObjectId(_id)}):
+			
+			if(sub_task==None):
+				break
+
+			intermediate_sub_tasks.append(sub_task)
+		app.logger.debug('working till here')
+		intermediate_sub_tasks=sorted(intermediate_sub_tasks,key=sorter)
+		for sub_task in intermediate_sub_tasks:
 			
 			if(sub_task==None):
 				break
@@ -278,6 +305,7 @@ def task():
 				'method':task['method']})
 
 		app.logger.debug('inside task function - after aggregating tasks')
+		
 		return render_template('task.html',task=task,sub_tasks=display_sub_tasks)
 	except:
 		return render_template('task_error.html')
@@ -435,10 +463,20 @@ def delete_task():
 
 @app.route('/perform_task')
 def perform_task():
+	
+	_id=request.args.get('id')
+	result=task_worker(_id)	
+	if result==1:
+		return render_template('task_completion.html')	
+	else:
+		app.logger.error("ERROR in performing task: "+_id)
+		return render_template('task_completion.html')
+
+def task_worker(_id,instant=False):
 	def send_mail(msg):
 		mail.send(msg)
 
-	_id=request.args.get('id')
+
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	app.logger.debug(_id)
@@ -461,6 +499,7 @@ def perform_task():
 
 			task['state']='done'
 			db.reminders.save(task)
+			return 1
 
 		if('call_id' in task):
 			call=client.calls.get(task['call_id'])
@@ -471,9 +510,10 @@ def perform_task():
 			db.status.save(reminder_task)
 			task['state']='done'
 			db.reminders.save(task)
+			return 1
 
 
-	if task['method']=='sms' and task['state']=='active':
+	if task['method']=='sms' and (task['state']=='active' or instant==True):
 		account_sid = ACCOUNT_SID
 		auth_token = AUTH_TOKEN
 		client = TwilioRestClient(account_sid, auth_token)
@@ -511,9 +551,9 @@ def perform_task():
 
 		db.reminders.save(url_task)
 		db.reminders.save(task)
-		return render_template('task_completion.html')	
+		return 1
 
-	if task['method']=='voice' and task['state']=='active':
+	if task['method']=='voice' and (task['state']=='active' or instant==True):
 		account_sid = ACCOUNT_SID
 		auth_token = AUTH_TOKEN
 		client = TwilioRestClient(account_sid, auth_token)
@@ -558,9 +598,9 @@ def perform_task():
 
 		db.reminders.save(url_task)
 		db.reminders.save(task)
-		return render_template('task_completion.html')
+		return 1
 
-	if task['method']=='email' and task['state']=='active':
+	if task['method']=='email' and (task['state']=='active' or instant==True):
 
 		subject='Reminder: '+task['message']
 		if('subject' in task):
@@ -585,10 +625,8 @@ def perform_task():
 
 
 		db.reminders.save(task)
-		return render_template('task_completion.html')
-	else:
-		return render_template('task_completion.html')
-	
+		return 1
+	return 1
 
 if app.debug is None or app.debug is False or app.debug is True:   
 	    import logging
