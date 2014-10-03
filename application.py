@@ -473,8 +473,14 @@ def perform_task():
 		return render_template('task_completion.html')
 
 def task_worker(_id,instant=False):
-	def send_mail(msg):
-		mail.send(msg)
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/remindica.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+		
+		app.logger.debug(result)
 
 
 	client=MongoClient()
@@ -602,7 +608,7 @@ def task_worker(_id,instant=False):
 
 	if task['method']=='email' and (task['state']=='active' or instant==True):
 
-		subject='Reminder: '+task['message']
+		"""subject='Reminder: '+task['message']
 		if('subject' in task):
 			subject=task['subject']
 		msg = Message(subject,body=task['message'],html=task['message'], sender = app.config['MAIL_SENDER'], recipients =[task['details']])
@@ -612,7 +618,32 @@ def task_worker(_id,instant=False):
 			with app.open_resource('./'+task['attachment']) as fp:
 				msg.attach(filename=task['attachment_name'],content_type='application/octet-stream',data=fp.read())
 		p=multiprocessing.Process(target=send_mail,args=(msg,))
+		p.start()"""
+
+		subject='Reminder: '+task['message']
+		if('subject' in task):
+			subject=task['subject']
+
+		text=task['message']
+		html=task['message']
+		creator_id=task['creator_id']
+		user=db.users.find({'_id':creator_id})
+		user=user.next()
+		files=None
+		if ('attachment' in task):
+			files=[("attachment",open(task['attachment']))]
+		from_name='Remindica'
+		if 'name' in user:
+			from_name=user['name']
+		recipient=task['details']
+		data={"from": from_name + " <admin@remindica.com>",
+              "to": [recipient],
+              "subject": subject,
+              "text": text,
+              "html":html}
+		p=multiprocessing.Process(target=send_mail,args=(data,files,))
 		p.start()
+		
 		app.logger.debug('Sending reminder email to:'+task['details'])
 		if(task['type']=='one-time'):
 			task['state']='done'
