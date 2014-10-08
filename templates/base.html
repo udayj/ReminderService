@@ -1,4 +1,4 @@
-<html>
+<html class="js cssanimations csstransitions">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!--[if lt IE 9]>
@@ -6,13 +6,32 @@
 <![endif]-->
    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
   <!--script src="http://code.jquery.com/jquery-1.11.0.min.js"></script-->
-  <script src="//code.jquery.com/jquery-1.9.1.min.js"></script>
-  <!--script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script-->
+  <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
   <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
   <script src="/static/javascript/bootstrap.min.js"></script>
   <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet" />
+  <link href="/static/stylesheets/style.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/line-icons/line-icons.css">  
+  <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/static/flexslider/flexslider.css">  
+    <link rel="stylesheet" href="/static/parallax-slider/css/parallax-slider.css">
+  <link href="/static/stylesheets/blue.css" rel="stylesheet" id="style_color"/>
   <script src="/static/javascript/jquery-te-1.4.0.min.js"></script>
   <link href="/static/stylesheets/jquery-te-1.4.0.css" rel="stylesheet" />
+  <script type="text/javascript" src="/static/flexslider/jquery.flexslider-min.js"></script>
+  <script type="text/javascript" src="/static/parallax-slider/js/modernizr.js"></script>
+  <script type="text/javascript" src="/static/parallax-slider/js/jquery.cslider.js"></script>
+  <script type="text/javascript" src="/static/javascript/app.js"></script>
+  <script type="text/javascript" src="/static/javascript/index.js"></script>
+
+  <script type="text/javascript">
+    jQuery(document).ready(function() {
+        App.init();
+        App.initSliders();
+        Index.initParallaxSlider();        
+    });
+</script>
   <!--link href="/static/stylesheets/custom.css" rel="stylesheet"-->
   <!--link href="/static/stylesheets/theme.bootstrap.css" rel="stylesheet"-->
   
@@ -24,7 +43,7 @@
 </head>
 <body onload="$('#{{active}}').addClass('active');">
   <div class="container">
-
+<div class="header">
 <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -34,7 +53,7 @@
           <span class="icon-bar"></span>
         </button>
 
-        <a class="navbar-brand" href="/">Remindica</a>
+        <a class="navbar-brand" href="/" style="top:10px;color:#777;font-size:20px;"><b>REMINDICA</b></a>
       </div>
         <div class="collapse navbar-collapse" id="navbar-main">
           <ul class="nav navbar-nav">
@@ -51,11 +70,7 @@
             {% else %}
             <li id="new_task"><a href="/new_task">New</a></li>
             {% endif %}
-            
-          </ul>
-            
-          <ul class="nav navbar-nav navbar-right">
-               {% if not current_user.email %}
+             {% if not current_user.email %}
                 
                 <li id='signup'><a href="/signup">SignUp</a></li>
                 <li id='login'><a href="/login">Login</a></li>
@@ -70,6 +85,11 @@
                 
                 
                 {% endif %}
+
+          </ul>
+            
+          <ul class="nav navbar-nav navbar-right">
+              
             
           </ul>
         </div><!-- /.nav-collapse -->
@@ -77,12 +97,47 @@
     
   </nav><!-- /navbar -->
 </div>
+</div>
   {% block content %}
   {% endblock %}
   
+  <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 md-margin-bottom-40">
+                    <!-- About -->
+                    <div class="headline"><h2>About</h2></div>  
+                    <p class="margin-bottom-25 md-margin-bottom-40"> We are a technology powered company based in India. We create software on the cutting edge of technology in the fields of telecommunications, machine learning, cloud infrastructure, mobile and analytics</p>    
+                    <!-- End About -->
+                  </div>
+                  <div class="col-md-6 md-margin-bottom-40">
+                    <!-- About -->
+                    <div class="headline"><h2>Contact Us</h2></div>  
+                    <p class="margin-bottom-25 md-margin-bottom-40">We can be reached at udayj.dev@gmail.com</p>    
+                    <!-- End About -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="copyright">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">                     
+                    <p>
+                        2014 &copy; Remindica - ALL Rights Reserved. 
+                        
+                    </p>
+                </div>
+                
+            </div>
+        </div> 
+    </div><!--/copyright--> 
+
 </body>
 
 <script>
 $("body").on("touchdown.dropdown",".dropdown-menu",function(e) { e.stopPropagation();});
+</script>
+
 </html>
 
