@@ -42,10 +42,9 @@
   </script>
 </head>
 <body onload="$('#{{active}}').addClass('active');">
-  <div class="container">
-<div class="header">
-<nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
+  <div class="header">
+<div class="navbar navbar-default" role="navigation">
+    <div class="container">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-main">
           <span class="icon-bar"></span>
@@ -58,12 +57,9 @@
         <div class="collapse navbar-collapse" id="navbar-main">
           <ul class="nav navbar-nav">
             <li id="front" ><a href="/">Home</a></li>
-            {% if not current_user.email %}
-            <li id="new_user_task"><a href="/new_user_task">Tasks</a></li>
-            
-            {% else %}
+           
             <li id="task_list"><a href="/task_list">Tasks</a></li>
-            {% endif %}
+           
             {% if not current_user.email %}
             <li id="new_task_logged_in"><a href="/new_task">New</a></li>
             
@@ -78,7 +74,7 @@
                 {% else %}
                 <li><a href="/logout">Logout</a></li>
 
-                <li><a href="#"> Hi,
+                <li><a href="/"> Hi,
                 {{current_user.name}}</a>
                 </li>
                 
@@ -95,9 +91,9 @@
         </div><!-- /.nav-collapse -->
       </div>
     
-  </nav><!-- /navbar -->
+  </div><!-- /navbar -->
 </div>
-</div>
+
   {% block content %}
   {% endblock %}
   
@@ -113,7 +109,7 @@
                   <div class="col-md-6 md-margin-bottom-40">
                     <!-- About -->
                     <div class="headline"><h2>Contact Us</h2></div>  
-                    <p class="margin-bottom-25 md-margin-bottom-40">We can be reached at udayj.dev@gmail.com</p>    
+                    <p class="margin-bottom-25 md-margin-bottom-40">We can be reached at +91-9830906922</p>    
                     <!-- End About -->
                   </div>
                 </div>
