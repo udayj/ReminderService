@@ -166,6 +166,13 @@ def activate():
 
 @app.route('/signup',methods=['GET','POST'])
 def signup():
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/remindica.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+
 	if request.method=='GET':
 		return render_template('login.html',active='signup')
 	else:
@@ -199,16 +206,25 @@ def signup():
 		
 		msg.body = 'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash
 		app.logger.debug('Sending activation email to:'+data['email'])
+
+		data={"from": "Remindica <admin@remindica.com>",
+              "to": [data['email']],
+              "subject": 'Welcome to Remindica',
+              "text": 'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash,
+              "html":'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash}
 		#app.logger.debug(activation_hash)
 		#app.logger.debug(str(app.extensions['mail'].server))
 		try:
-			mail.send(msg)
+			send_mail(data,None)
 		except Exception:
 			db.users.remove({'_id':_id})
 			return render_template('login.html',signup_error='Problem sending email. Account not created. Try again later.',
 									username=username,email=data['email'])
 		return render_template('checkmail.html')
 
+@app.route('/faq')
+def faq():
+	return render_template('faq.html',active='faq')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -608,17 +624,7 @@ def task_worker(_id,instant=False):
 
 	if task['method']=='email' and (task['state']=='active' or instant==True):
 
-		"""subject='Reminder: '+task['message']
-		if('subject' in task):
-			subject=task['subject']
-		msg = Message(subject,body=task['message'],html=task['message'], sender = app.config['MAIL_SENDER'], recipients =[task['details']])
-
-		msg.body = task['message']
-		if ('attachment' in task):
-			with app.open_resource('./'+task['attachment']) as fp:
-				msg.attach(filename=task['attachment_name'],content_type='application/octet-stream',data=fp.read())
-		p=multiprocessing.Process(target=send_mail,args=(msg,))
-		p.start()"""
+		
 
 		subject='Reminder: '+task['message']
 		if('subject' in task):
