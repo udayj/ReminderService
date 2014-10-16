@@ -174,7 +174,7 @@ def signup():
         data=data)
 
 	if request.method=='GET':
-		return render_template('login.html',active='signup')
+		return render_template('signup.html',active='signup')
 	else:
 		
 		data={}
@@ -225,6 +225,104 @@ def signup():
 @app.route('/faq')
 def faq():
 	return render_template('faq.html',active='faq')
+
+@app.route('/change-password',methods=['GET','POST'])
+def change_password():
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/remindica.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+	if request.method=='GET':
+		forgot_password_hash=request.args.get('hash')
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		user=db.users.find({'forgot_password_hash':forgot_password_hash})
+		try:
+			user=user.next()
+			if user['forgot_password']==True:
+				return render_template('change-password.html',email=user['email'])
+			else:
+				return render_template('change-password.html',
+					error="Password already changed using this link - please request another password reset",email=user['email'])
+		except StopIteration:
+			return render_template('change-password.html',error='Problem with this link - please contact support@remindica.com')
+
+	else:
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0]
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		
+		email=None
+		if 'email' in data and 'password' in data:
+			email=data['email']
+			password=data['password']
+		else:
+			app.logger.debug('Change password form submitted without email/password')
+			return render_template('change-password.html',error="Please re-enter details to reset password")
+
+		user=db.users.find({'email':email})
+		
+		try:
+			user=user.next()
+			if user['forgot_password']!=True:
+				return render_template('change-password.html',error='Please request another password reset link')	
+			user['password']=hashlib.sha512(SALT+password).hexdigest()
+			user['forgot_password']=False
+			db.users.save(user)
+			return render_template('change-password.html',success='Password changed successfully')
+		except StopIteration:
+			return render_template('change-password.html',error='Please request another password reset link')
+
+
+@app.route('/forgot-password',methods=['GET','POST'])
+def forgot_password():
+	def send_mail(data,files):
+		result=requests.post(
+        "https://api.mailgun.net/v2/remindica.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        files=files,
+        data=data)
+	if request.method=='GET':
+		return render_template('forgot-password.html')
+	else:
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0]
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		salt='remindicaforgotpassword'
+		email=None
+		if 'email' in data:
+			email=data['email']
+		else:
+			app.logger.debug('Forgot password form submitted without email')
+			return render_template('forgot-password.html',error="Please enter correct email id to reset password")	
+
+		user=db.users.find({'email':email})
+		forgot_password_hash=hashlib.sha512(salt+data['email']).hexdigest()[10:30]
+		try:
+			user=user.next()
+			user['forgot_password_hash']=forgot_password_hash
+			user['forgot_password']=True
+			db.users.save(user)
+			data={"from": "Remindica <admin@remindica.com>",
+	              "to": email,
+	              "subject": 'Reset your password',
+	              "text": 'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash,
+	              "html":'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash}
+			try:
+				send_mail(data,None)
+				return render_template('forgot-password.html',success="Password reset instructions sent to your email id")
+			except:
+				return render_template('forgot-password.html',error="Could not send password reset instructions - please try again")
+		except StopIteration:
+			return render_template('forgot-password.html',error="Please enter correct email id to reset password")			
+
+
 
 @app.route('/login',methods=['GET','POST'])
 def login():
