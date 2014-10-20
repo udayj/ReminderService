@@ -8,32 +8,34 @@
 		</h1>
 	</div>
 </div>
+
 	<div class="container">
 
 		<div class="row">
 			<div class="col-lg-12 col-md-12">
-				<table id="task-table" class="table table-bordered table-striped table-hover tablesorter">
+				<table id="task-table" class="table table-bordered table-striped table-hover tablesaw tablesaw-stack" data-mode="stack">
 					<thead>
 						<tr>
-							<td>
+							<th >
 								Status
-							</td>
-							<td>
+							</th>
+							<th >
 								Message
-							</td>
-							<td>
+							</th>
+							<th >
 								Time
-							</td>
-							<td>
+							</th>
+							<th >
 								Method
-							</td>
-							<td>
+							</th>
+							<th >
 								Delete
-							</td>
-							<td>
+							</th>
+							<th >
 								Details
-							</td>
+							</th>
 						</tr>
+						
 					</thead>
 					<tbody>
 					{% for task in tasks %}
