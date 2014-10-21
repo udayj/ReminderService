@@ -149,7 +149,7 @@ login_manager.setup_app(app)
 def activate():
 	activation_hash=request.args.get('hash')
 	if not activation_hash:
-		return render_template('activate.html',message='Sorry account not activated')
+		return render_template('activate_error.html')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	user=db.users.find({'activation_hash':activation_hash})
@@ -159,9 +159,9 @@ def activate():
 		db.users.save(user)
 		ret_user=User(name=user['name'],email=user['email'],password="",active=user['active'],_id=str(user['_id']))
 		login_user(ret_user)
-		return render_template('activate.html',message='Welcome to Reminder Service. Your account has been activated')
+		return render_template('activate.html')
 	except StopIteration:
-		return render_template('activate.html',message='Sorry account not activated')
+		return render_template('activate_error.html')
 
 
 @app.route('/signup',methods=['GET','POST'])
@@ -191,7 +191,7 @@ def signup():
 		exist_user=db.users.find({'email':data['email']})
 		try:
 			exist_user.next()
-			return render_template('login.html',active='signup',signup_error='Email already exists',username=username,email=data['email'])
+			return render_template('signup.html',active='signup',signup_error='Email already exists',username=username,email=data['email'])
 		except StopIteration:
 			pass
 
@@ -215,10 +215,11 @@ def signup():
 		#app.logger.debug(activation_hash)
 		#app.logger.debug(str(app.extensions['mail'].server))
 		try:
-			send_mail(data,None)
+			p=multiprocessing.Process(target=send_mail,args=(data,None,))
+			p.start()
 		except Exception:
 			db.users.remove({'_id':_id})
-			return render_template('login.html',signup_error='Problem sending email. Account not created. Try again later.',
+			return render_template('signup.html',signup_error='Problem sending email. Account not created. Try again later.',
 									username=username,email=data['email'])
 		return render_template('checkmail.html')
 
@@ -315,7 +316,9 @@ def forgot_password():
 	              "text": 'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash,
 	              "html":'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash}
 			try:
-				send_mail(data,None)
+				p=multiprocessing.Process(target=send_mail,args=(data,None,))
+				p.start()
+				
 				return render_template('forgot-password.html',success="Password reset instructions sent to your email id")
 			except:
 				return render_template('forgot-password.html',error="Could not send password reset instructions - please try again")
@@ -559,7 +562,7 @@ def task_list():
 			app.logger.debug(inst)
 			app.logger.error('Problem submitting task')
 			output.sort(key=sorter)
-			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later',active='task_list')
+			return render_template('new_task.html',tasks=output,error='Problem submitting task. Try again later',active='new_task')
 			
 	output.sort(key=sorter)
 	return render_template('list.html',tasks=output,active='task_list')
