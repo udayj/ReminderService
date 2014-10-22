@@ -206,12 +206,12 @@ def signup():
 		
 		msg.body = 'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash
 		app.logger.debug('Sending activation email to:'+data['email'])
-
+		html_content=render_template("activate_email.html",name=username, url=app.config['HOST']+'/activate?hash='+activation_hash)
 		data={"from": "Remindica <admin@remindica.com>",
               "to": [data['email']],
               "subject": 'Welcome to Remindica',
               "text": 'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash,
-              "html":'Click this link to activate your account '+app.config['HOST']+'/activate?hash='+activation_hash}
+              "html":html_content}
 		#app.logger.debug(activation_hash)
 		#app.logger.debug(str(app.extensions['mail'].server))
 		try:
