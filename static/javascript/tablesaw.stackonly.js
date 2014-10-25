@@ -205,8 +205,10 @@
 					if( iteration ){
 						filter = "td:nth-child("+ iteration +"n + " + ( colstart ) +")";
 					}
+
 					$cells.filter( filter ).prepend( "<b class='" + classes.cellLabels + hierarchyClass + "'>" + text + "</b>"  );
 				} else {
+					
 					$cells.prepend( "<b class='" + classes.cellLabels + "'>" + text + "</b>"  );
 				}
 			}

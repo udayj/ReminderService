@@ -310,11 +310,12 @@ def forgot_password():
 			user['forgot_password_hash']=forgot_password_hash
 			user['forgot_password']=True
 			db.users.save(user)
-			data={"from": "Remindica <admin@remindica.com>",
+			html_content=render_template("forgot_password_email.html",url=app.config['HOST']+'/change-password?hash='+forgot_password_hash)
+			data={"from": "Remindica <support@remindica.com>",
 	              "to": email,
 	              "subject": 'Reset your password',
 	              "text": 'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash,
-	              "html":'Click this link to change your password '+app.config['HOST']+'/change-password?hash='+forgot_password_hash}
+	              "html":html_content}
 			try:
 				p=multiprocessing.Process(target=send_mail,args=(data,None,))
 				p.start()
