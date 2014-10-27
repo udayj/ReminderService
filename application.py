@@ -153,12 +153,34 @@ def activate():
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	user=db.users.find({'activation_hash':activation_hash})
+	week_day={0:'monday',1:'tuesday',2:'wednesday',3:'thursday',4:'friday',5:'saturday',6:'sunday'}
 	try:
 		user=user.next()
+		user_active=False
+		user_active=user['active']
 		user['active']=True
 		db.users.save(user)
 		ret_user=User(name=user['name'],email=user['email'],password="",active=user['active'],_id=str(user['_id']))
 		login_user(ret_user)
+
+		if user_active is not True:
+			task={}
+			task['type']='weekly'
+			task['time']=datetime.now()+timedelta(hours=9,minutes=29)
+			task['state']='active'
+			task['timezone']='IST'
+			task['method']='email'
+			task['details']=user['email']
+			task['creator']='admin'
+			task['day_of_week']=week_day[datetime.today().weekday()]
+			task['day_of_month']=1
+			task['creator_id']=ObjectId(str(user['_id']))
+			task['creation_time']=datetime.now()
+			task['subject']='Greetings from Remindica'
+			task['message']='This is a greeting message from Remindica - your personal virtual assistant'
+			task['marketing_email']=True
+			db.reminders.save(task)
+		
 		return render_template('activate.html')
 	except StopIteration:
 		return render_template('activate_error.html')
@@ -733,7 +755,8 @@ def task_worker(_id,instant=False):
 			subject=task['subject']
 
 		text=task['message']
-		html=task['message']
+		
+
 		creator_id=task['creator_id']
 		user=db.users.find({'_id':creator_id})
 		user=user.next()
@@ -743,6 +766,15 @@ def task_worker(_id,instant=False):
 		from_name='Remindica'
 		if 'name' in user:
 			from_name=user['name']
+
+		if 'marketing_email' in task and task['marketing_email']==True:
+			from_name = 'Remindica'
+			if 'name' in user:
+				html=render_template('marketing_email.html',user=user['name'],url=app.config['HOST']+'/task_list')
+			else:
+				html=render_template('marketing_email.html',user='',url=app.config['HOST']+'/task_list')
+		else:
+			html=task['message']
 		recipient=task['details']
 		data={"from": from_name + " <admin@remindica.com>",
               "to": [recipient],
