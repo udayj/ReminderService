@@ -790,7 +790,7 @@ def task_worker(_id,instant=False):
 		task_status={}
 		task_status['task_id']=task['_id']
 		task_status['type']=task['type']
-		task_status['time_performed']=datetime.now()
+		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
 		task_status['status']='sent'
 		db.status.save(task_status)
 
