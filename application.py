@@ -77,22 +77,47 @@ def new_user_task():
 @app.route('/admin')
 def admin():
 	def sorter(task):
-		return task['state']+str(task['time'])
+		if('creation_time' in task):
+			epoch=datetime.utcfromtimestamp(0)
+			delta=task['creation_time']-epoch
+			return task['state']+str(1000000000000-delta.total_seconds())+task['type']+str(task['time'])
+		else:
+			return task['state']+task['type']+str(task['time'])
 
-	password=request.args.get('password')
-	if password==app.config['ADMIN_PASSWORD']:
+	if request.method=='GET':
+		password=request.args.get('password')
+		if password==app.config['ADMIN_PASSWORD']:
 
-		client=MongoClient()
-		db=client[app.config['DATABASE']]
-		
-		tasks=db.reminders.find()
-		output=[]
-		for task in tasks:
-			output.append(task)
-		output.sort(key=sorter)
-		return render_template('list.html',tasks=output)
+			client=MongoClient()
+			db=client[app.config['DATABASE']]
+			
+			tasks=db.reminders.find()
+			output=[]
+			for task in tasks:
+				if 'creator_id' in task:
+					creator_id=task['creator_id']
+
+					user=db.users.find({'_id':creator_id})
+					try:
+						user=user.next()
+						task['creator_email']=user['email']
+					except StopIteration:
+						task['creator_email']='admin'
+				else:
+					task['creator_email']='admin'
+
+				output.append(task)
+			output.sort(key=sorter)
+			users=db.users.find()
+			output_users=[]
+			for user in users:
+				output_users.append(user)
+
+			return render_template('admin.html',tasks=output,users=output_users)
+		else:
+			return redirect(url_for('front'))
 	else:
-		return redirect(url_for('front'))		
+		return redirect(url_for('front'))
 
 def allowed_file(filename):
     return '.' in filename and \
