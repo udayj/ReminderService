@@ -630,7 +630,9 @@ def delete_task():
 def perform_task():
 	
 	_id=request.args.get('id')
-	result=task_worker(_id)	
+	instant=False
+	instant=request.args.get('instant')
+	result=task_worker(_id,instant)	
 	if result==1:
 		return render_template('task_completion.html')	
 	else:
