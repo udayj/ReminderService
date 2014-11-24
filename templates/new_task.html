@@ -210,8 +210,8 @@
           			   <div class="form-group">
 			            <label class="control-label col-lg-2 col-md-2 col-sm-2" for="input01">Recipient</label>
 			            <div class="col-lg-8 col-md-8 col-sm-8">
-			              <input type="text" class="input-xlarge form-control" id="details" name="details">
-			              <!--p class="help-block">In addition to freeform text, any HTML5 text-based input appears like so.</p-->
+			              <input type="email" class="input-xlarge form-control" id="details" name="details" placeholder="eg. abc@xyz.com">
+			              <p id="recipient-helper" class="help-block">Enter a valid email address eg. abc@xyz.com</p>
 			            </div>
 			          </div>
 
@@ -300,6 +300,9 @@ function method_controller(obj)
 		$('#sms-message-controller').css('display','none');
 		$('#subject-message-controller').css('display','');
 		$('#attachment-controller').css('display','');
+		$('#recipient-helper').html('Enter a valid email address eg. abc@xyz.com');
+		$('#details').attr('type','email');
+		$('#details').attr('placeholder','eg. abc@xyz.com');
 		//$('#country-code-controller').css('display','none');
 	}
 	if(method=='SMS' || method=='Voice')
@@ -308,6 +311,9 @@ function method_controller(obj)
 		$('#email-message-controller').css('display','none');
 		$('#subject-message-controller').css('display','none');
 		$('#attachment-controller').css('display','none');
+		$('#recipient-helper').html('Enter a valid phone number eg. 9830906922 without +91 or 0');
+		$('#details').attr('type','text');
+		$('#details').attr('placeholder','eg. 9830906922');
 		//$('#country-code-controller').css('display','');
 	}
 }
