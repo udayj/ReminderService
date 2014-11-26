@@ -76,7 +76,11 @@
 		<div class="row">
 			<div class="col-lg-9 col-md-9">
 				<br>
+				{% if archive %}
+				<div class="alert alert-danger fade in">No archived tasks in the system.</div>
+				{% else %}
 				<div class="alert alert-danger fade in">No tasks created yet. Creat the first task below.</div>
+				{% endif %}
 				
 				<br>
 			</div>

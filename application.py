@@ -626,7 +626,7 @@ def task_list():
 			
 	output.sort(key=sorter)
 	if archive=='true':
-		return render_template('list.html',tasks=output,active='archive_task_list')
+		return render_template('list.html',tasks=output,active='archive_task_list',archive='true')
 	else:
 		return render_template('list.html',tasks=output,active='task_list')
 
