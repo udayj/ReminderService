@@ -425,8 +425,15 @@ def task():
 			'th','st','nd','rd','th','th','th','th','th','th','th','st']
 	_id=request.args.get('id')
 	instant=request.args.get('instant')
+	archive=request.args.get('archive')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
+
+	if archive=='true':
+		task=db.reminders.find({'_id':ObjectId(_id)})
+		task=task.next()
+		task['state']='archived'
+		db.reminders.save(task)
 
 	if instant=='true':
 		task=db.reminders.find({'_id':ObjectId(_id)})
@@ -491,10 +498,15 @@ def task_list():
 			return task['state']+str(1000000000000-delta.total_seconds())+task['type']+str(task['time'])
 		else:
 			return task['state']+task['type']+str(task['time'])
+	archive=request.args.get('archive')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	_id=current_user.id
-	tasks=db.reminders.find({'creator_id':ObjectId(_id)})
+
+	if archive=='true':
+		tasks=db.reminders.find({'creator_id':ObjectId(_id),'state':'archived'})
+	else:
+		tasks=db.reminders.find({'$or': [{'creator_id':ObjectId(_id),'state':'active'},{'creator_id':ObjectId(_id),'state':'done'}]})
 	output=[]
 	for task in tasks:
 		task['time_output']=''
@@ -613,7 +625,10 @@ def task_list():
 			return render_template('new_task.html',tasks=output,error='Problem submitting task. Try again later',active='new_task')
 			
 	output.sort(key=sorter)
-	return render_template('list.html',tasks=output,active='task_list')
+	if archive=='true':
+		return render_template('list.html',tasks=output,active='archive_task_list')
+	else:
+		return render_template('list.html',tasks=output,active='task_list')
 
 @app.route('/delete_task')
 def delete_task():
