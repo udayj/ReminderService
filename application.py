@@ -70,7 +70,7 @@ def profile():
 	_id=current_user.id
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
-	count_active=db.reminders.find({'creator_id':ObjectId(_id)}).count()
+	count_active=db.reminders.find({'creator_id':ObjectId(_id),'state':'active'}).count()
 	recipients=[]
 	tasks=db.reminders.find({'creator_id':ObjectId(_id)})
 	recipient_tags=db.tags.find({'creator_id':ObjectId(_id)})
