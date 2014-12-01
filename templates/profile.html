@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/stylesheets/faq.css">
+
+ <div class="breadcrumbs-v2 faq-breadcrumb margin-bottom-20">
+        <div class="breadcrumbs-v2-in">
+            <h1>PROFILE PAGE</h1>
+            <ul class="breadcrumb-v2 list-inline">
+                <li>
+            </ul>
+        </div>    
+    </div>
+</div>
+
+	<div class="container">
+
+				<div class="row">
+			<div class="col-lg-6 col-md-6">
+				<div class="panel panel-blue margin-bottom-40">
+					<div class="panel-heading">
+					<h3 class="panel-title">
+					<i class="fa fa-tasks"></i>	Basic Account Details
+					</h3>
+				</div>
+					<div class="panel-body">
+						<p>
+							This table shows some account details and statistics.
+						</p>
+					</div>
+
+				<table id="task-table" class="table table-bordered table-striped table-hover">
+					
+						
+					
+					<tbody>
+						<tr>
+							<td> Username </td>
+							<td> {{current_user.name}}</td>
+						</tr>
+						<tr>
+							<td> Registered Email </td>
+							<td> {{current_user.email}}</td>
+						</tr>
+						<tr>
+							<td> No. of Active Tasks </td>
+							<td> {{count_active}}</td>
+						</tr>
+
+
+					</tbody>
+				</table>
+			</div>
+			</div>
+		</div>
+		{% if tags|length > 0 %}
+		<div class="row">
+			<div class="col-lg-6 col-md-6">
+				<div class="panel panel-blue margin-bottom-40">
+					<div class="panel-heading">
+					<h3 class="panel-title">
+					<i class="fa fa-tasks"></i>	Saved Contacts
+					</h3>
+				</div>
+					<div class="panel-body">
+						<p>
+							These recipients have already been saved in your contact list.
+						</p>
+					</div>
+
+				<table id="task-table" class="table table-bordered table-striped table-hover">
+					<thead>
+						<tr>
+							<th >
+								Recipient
+							</th>
+							<th >
+								Saved As
+							</th>
+							
+						</tr>
+						
+					</thead>
+					<tbody>
+						{% for tag in tags %}
+						<tr>
+							<td>
+								{{tag['recipient']}}
+							</td>
+							<td>
+								{{tag['tag']}}
+					      </td>
+							
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			</div>
+		</div>
+		{% endif %}
+
+		<div class="row">
+			<div class="col-lg-6 col-md-6">
+				<div class="panel panel-blue margin-bottom-40">
+					<div class="panel-heading">
+					<h3 class="panel-title">
+					<i class="fa fa-tasks"></i>	Save or Change Contacts
+					</h3>
+				</div>
+					<div class="panel-body">
+						<p>
+							Tag/save your recipients whom you have sent email/phone calls in this contact list. This way you dont have to remember the exact phone number or email id. Simply search the recipient by the name when you create a task.
+						</p>
+					</div>
+
+				<table id="task-table" class="table table-bordered table-striped table-hover">
+					<thead>
+						<tr>
+							<th >
+								Recipient
+							</th>
+							<th >
+								Save As
+							</th>
+							<th >
+								Save
+							</th>
+							
+						</tr>
+						
+					</thead>
+					<tbody>
+						{% for recipient in recipients %}
+						<tr>
+							<td>
+								{{recipient}}
+							</td>
+							<td>
+								<div class="form-group" style="margin-left:0px;">
+			            
+			            		<div class="col-lg-12 col-md-12" style="margin-left:0px;">
+			              			<input type="text" class="input-xlarge form-control" id="{{recipient}}" name="details" placeholder="" >
+			              
+			            		</div>
+					          </div>
+					      </td>
+							<td>
+								<div class="btn-u btn-u-blue" id="div{{recipient}}" onclick="save_recipient(this.id)">Save</div>
+								<i id="check{{recipient}}" class="fa fa-check color-blue" style="display:none;"></i>
+							</td>
+								
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	function save_recipient(recipient)
+	{
+		tag=document.getElementById(recipient.substring(3)).value;
+		
+		$.ajax({
+			url:"/save_recipient",
+			type:"post",
+			data:{
+				'recipient':recipient.substring(3),
+				'tag':tag
+			},
+			success:function(){
+
+				document.getElementById("check"+recipient.substring(3)).setAttribute('style','');
+			}
+		});
+	}
+	</script>
+		{% endblock %}

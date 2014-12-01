@@ -1,5 +1,5 @@
  # -*- coding: utf-8 -*-
-from flask import Flask, request, render_template, Response, redirect, url_for,flash 
+from flask import Flask, request, render_template, Response, redirect, url_for,flash, jsonify
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import json
@@ -62,6 +62,77 @@ class User(UserMixin):
 def front():
 	
 	return render_template('front.html',active='front')
+
+@app.route('/profile')
+@login_required
+def profile():
+	
+	_id=current_user.id
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	count_active=db.reminders.find({'creator_id':ObjectId(_id)}).count()
+	recipients=[]
+	tasks=db.reminders.find({'creator_id':ObjectId(_id)})
+	recipient_tags=db.tags.find({'creator_id':ObjectId(_id)})
+	tags=[]
+	for recipient_tag in recipient_tags:
+		tags.append({'recipient':recipient_tag['recipient'],'tag':recipient_tag['tag']})
+
+	for task in tasks:
+		if task['details'] not in recipients:
+			recipients.append(task['details'])
+
+	return render_template('profile.html',active='profile',count_active=count_active,recipients=recipients,tags=tags)
+
+@app.route('/save_recipient',methods=['POST'])
+@login_required
+def save_recipient():
+	
+	_id=current_user.id
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	recipients=[]
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0]
+	app.logger.debug(data)
+	record={}
+	record['creator_id']=ObjectId(_id)
+	record['recipient']=data['recipient']
+	record['tag']=data['tag']
+	count=db.tags.find({'creator_id':ObjectId(_id),'recipient':data['recipient']}).count()
+	if count==0:
+		db.tags.save(record)
+	else:
+		tag=db.tags.find({'creator_id':ObjectId(_id),'recipient':data['recipient']})
+		tag=tag.next()
+		tag['tag']=data['tag']
+		db.tags.save(tag)
+
+
+	return jsonify({'status':'success'})
+
+@app.route('/options')
+def options():
+	q=request.args.get('term')
+	q=q.strip()
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	_id=current_user.id
+	pattern=re.compile('.*'+q+'.*')
+	
+	recipients=db.tags.find({'$or': [{'creator_id':ObjectId(_id),'tag':pattern},{'creator_id':ObjectId(_id),'recipient':pattern}]})
+	
+	output=[]
+	try:
+		for recipient in recipients:
+			output.append({'value':recipient['tag']+' <'+recipient['recipient']+'>'})
+	except StopIteration:
+		pass
+	js=json.dumps(output)
+	
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 @app.route('/new_task')
 @login_required
@@ -503,6 +574,7 @@ def task_list():
 	db=client[app.config['DATABASE']]
 	_id=current_user.id
 
+
 	if archive=='true':
 		tasks=db.reminders.find({'creator_id':ObjectId(_id),'state':'archived'})
 	else:
@@ -580,7 +652,12 @@ def task_list():
 			task['creation_time']=datetime.now()
 
 			if task['method']=='sms' or task['method']=='voice':
-				task['details']=country_code+task['details']
+				if task['details'][0]=='+':
+					pass
+				elif task['details'][0]=='0':
+					task['details']=country_code+task['details'][1:]
+				else:
+					task['details']=country_code+task['details']
 
 			_id=db.reminders.save(task)
 			task['_id']=_id
