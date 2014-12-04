@@ -63,6 +63,26 @@ def front():
 	
 	return render_template('front.html',active='front')
 
+@app.route("/pause_task",methods=['POST'])
+@login_required
+def pause_task():
+	
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0]
+	
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	task=db.reminders.find({'_id':ObjectId(data['id'])})
+	try:
+		task=task.next()
+		task['state']=data['state']
+		db.reminders.save(task)
+	except StopIteration:
+		app.logger.debug('Problem changing task state from active to pause')
+	return jsonify({'status':'success'})
+
+
 @app.route('/profile')
 @login_required
 def profile():
@@ -566,9 +586,19 @@ def task_list():
 		if('creation_time' in task):
 			epoch=datetime.utcfromtimestamp(0)
 			delta=task['creation_time']-epoch
-			return task['state']+str(1000000000000-delta.total_seconds())+task['type']+str(task['time'])
+			prefix='1'
+			if task['state']=='done':
+				prefix='4'
+			if task['state']=='paused':
+				prefix='1'
+			return prefix+str(1000000000000-delta.total_seconds())+task['type']+str(task['time'])
 		else:
-			return task['state']+task['type']+str(task['time'])
+			prefix='1'
+			if task['state']=='done':
+				prefix='4'
+			if task['state']=='paused':
+				prefix='1'
+			return prefix+task['type']+str(task['time'])
 	archive=request.args.get('archive')
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
@@ -578,7 +608,8 @@ def task_list():
 	if archive=='true':
 		tasks=db.reminders.find({'creator_id':ObjectId(_id),'state':'archived'})
 	else:
-		tasks=db.reminders.find({'$or': [{'creator_id':ObjectId(_id),'state':'active'},{'creator_id':ObjectId(_id),'state':'done'}]})
+		tasks=db.reminders.find({'$or': [{'creator_id':ObjectId(_id),'state':'active'},{'creator_id':ObjectId(_id),'state':'done'},
+								{'creator_id':ObjectId(_id),'state':'paused'}]})
 	output=[]
 	for task in tasks:
 		task['time_output']=''

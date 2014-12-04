@@ -81,7 +81,7 @@
                  <tr>
                   <td>Status
                   </td>
-                  <td>
+                  <td id="task_state">
                     {{task['state']}}
                   </td>
                 </tr>
@@ -95,8 +95,19 @@
               <a href="/task?id={{task['_id']}}&instant=true" class="btn-u btn-u-blue">Perform immediately</a>
               {% endif %}
               <a href="/task?id={{task['_id']}}&archive=true" class="btn-u btn-u-blue">Archive </a>
-              
               <a href="#" onclick="show_copy()" class="btn-u btn-u-blue">Copy</a>
+              {% if task['state']=='active'%}
+              <div class="btn-u btn-u-orange" id="p{{task['_id']}}" onclick="pause_task(this.id,'paused')">Pause</div>
+              <div class="btn-u btn-u-green" id="r{{task['_id']}}" onclick="pause_task(this.id,'active')" style="display:none;">Resume</div>
+              {% endif %}
+
+              {% if task['state']=='paused' %}
+              <div class="btn-u btn-u-orange" id="p{{task['_id']}}" onclick="pause_task(this.id,'paused')" style="display:none;">Pause</div>
+              <div class="btn-u btn-u-green" id="r{{task['_id']}}" onclick="pause_task(this.id,'active')">Resume</div>
+
+              {% endif %}
+              
+              
               <a href="/delete_task?id={{task['_id']}}" class="btn-u btn-u-red">Delete </a>
               <br>
               
@@ -553,18 +564,47 @@ function show_copy()
   $("#task_details").css("display","none");
   $("#task_copy").css("display","");
   var task_type=$("#task_type").html().trim();
-  
+  var method=$("select[name=method]").val();
+  var method_obj={};
+  method_obj.value=method;
+  method_controller(method_obj);
   $("#type option").each(function(){
     if($(this).val()==task_type)
     {
       $(this).attr("selected",true);
     }
   });
-  var obj={}
+  var obj={};
   obj.value=task_type;
   input_controller(obj);
 
 }
+function pause_task(id,state)
+{
+  $.ajax({
+      url:"/pause_task",
+      type:"post",
+      data:{
+        'id':id.substring(1),
+        'state':state
+      },
+      success:function(){
 
+          if(state=='paused'){
+            $('#task_state').html(state);
+            $('#'+id).css('display','none');
+            $('#r'+id.substring(1)).css('display','');
+            
+            
+
+          }
+          else{
+            $('#task_state').html(state);
+            $('#'+id).css('display','none'); 
+            $('#p'+id.substring(1)).css('display','');
+                      }
+      }
+    });
+}
 </script>
       {% endblock %}
