@@ -237,7 +237,7 @@ def isEqual(task_time,system_time,task_timezone):
 	return True
 
 def validComponents(task):
-	keys=['message','time','type','method','details','datepicker']
+	keys=['message','time','type','method','details','date']
 	for key in keys:
 		if key not in task:
 			return False
@@ -644,7 +644,7 @@ def task_list():
 			month=7
 			day=7
 			try:
-				date=data['datepicker'].split("/")
+				date=data['date'].split("/")
 				year=int(date[2])
 				month=int(date[0])
 				day=int(date[1])
@@ -701,6 +701,8 @@ def task_list():
 					task['attachment_name']=attachment_name
 					task['attachment_original_name']=attachment.filename
 					db.reminders.save(task)
+			else: 
+				app.logger.debug('problem with attachment')
 
 
 			if task['method']=='voice':
