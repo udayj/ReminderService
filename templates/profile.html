@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="/static/stylesheets/sky-forms.css">
+<link rel="stylesheet" href="/static/stylesheets/sky-forms-blue.css">
+
 <link rel="stylesheet" href="/static/stylesheets/faq.css">
 
  <div class="breadcrumbs-v2 faq-breadcrumb margin-bottom-20">
@@ -14,6 +17,7 @@
 </div>
 
 	<div class="container">
+
 
 				<div class="row">
 			<div class="col-lg-6 col-md-6">
@@ -52,7 +56,48 @@
 				</table>
 			</div>
 			</div>
+
+			
 		</div>
+		<div class="row">
+			<div class="col-lg-6 col-md-6">
+				<div class="panel panel-blue margin-bottom-40">
+					<div class="panel-heading">
+					<h3 class="panel-title">
+					<i class="fa fa-tasks"></i>	General Settings
+					</h3>
+				</div>
+					<div class="panel-body">
+						<p>
+							This table shows some account settings.
+						</p>
+					</div>
+
+				<table id="task-table" class="table table-bordered table-striped table-hover">
+          			   
+			            <!--lael class="label">Select the checkbox if you want the dashboard to show recipient details</label-->
+			            <tbody>
+			    	        <tr><td>
+			        	  
+			        	  	{% if show_recipient=='true' %}
+			            	  <input type="checkbox" name="show_recipient" id="show_recipient" onchange="recipient_setting(this.id)" checked>
+			            	  {% else %}
+			            	  <input type="checkbox" name="show_recipient" id="show_recipient" onchange="recipient_setting(this.id)">
+			              	{% endif %}
+			              	Show recipient details on dashboard
+			            	
+			          
+				      </td>
+				  </tr>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+</div>
+			
+	
+		
 		{% if tags|length > 0 %}
 		<div class="row">
 			<div class="col-lg-6 col-md-6">
@@ -173,6 +218,22 @@
 			success:function(){
 
 				document.getElementById("check"+recipient.substring(3)).setAttribute('style','');
+			}
+		});
+	}
+	function recipient_setting(id)
+	{
+		var state=$('#'+id).is(':checked');
+		$.ajax({
+			url:"/recipient_setting",
+			type:"post",
+			data:{
+				'state':state
+				
+			},
+			success:function(){
+
+				
 			}
 		});
 	}

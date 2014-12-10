@@ -90,6 +90,8 @@ def profile():
 	_id=current_user.id
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
+	user=db.users.find({'_id':ObjectId(_id)})
+	user=user.next()
 	count_active=db.reminders.find({'creator_id':ObjectId(_id),'state':'active'}).count()
 	recipients=[]
 	tasks=db.reminders.find({'creator_id':ObjectId(_id)})
@@ -101,8 +103,12 @@ def profile():
 	for task in tasks:
 		if task['details'] not in recipients:
 			recipients.append(task['details'])
+	show_recipient='false'
+	if 'show_recipient' in user:
+		show_recipient=user['show_recipient']
 
-	return render_template('profile.html',active='profile',count_active=count_active,recipients=recipients,tags=tags)
+	return render_template('profile.html',active='profile',count_active=count_active,
+							recipients=recipients,tags=tags,show_recipient=show_recipient)
 
 @app.route('/save_recipient',methods=['POST'])
 @login_required
@@ -130,6 +136,24 @@ def save_recipient():
 		db.tags.save(tag)
 
 
+	return jsonify({'status':'success'})
+
+@app.route('/recipient_setting',methods=['POST'])
+@login_required
+def recipient_setting():
+	
+	_id=current_user.id
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	recipients=[]
+	data={}
+	for name,value in dict(request.form).iteritems():
+		data[name]=value[0]
+	record=db.users.find({'_id':ObjectId(_id)})
+	record=record.next()
+	record['show_recipient']=data['state']
+	db.users.save(record)
+	app.logger.debug(data)
 	return jsonify({'status':'success'})
 
 @app.route('/options')
@@ -603,7 +627,11 @@ def task_list():
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	_id=current_user.id
-
+	user=db.users.find({'_id':ObjectId(_id)})
+	user=user.next()
+	show_recipient='false'
+	if 'show_recipient' in user:
+		show_recipient=user['show_recipient']
 
 	if archive=='true':
 		tasks=db.reminders.find({'creator_id':ObjectId(_id),'state':'archived'})
@@ -736,9 +764,9 @@ def task_list():
 			
 	output.sort(key=sorter)
 	if archive=='true':
-		return render_template('list.html',tasks=output,active='archive_task_list',archive='true')
+		return render_template('list.html',tasks=output,active='archive_task_list',archive='true',show_recipient=show_recipient)
 	else:
-		return render_template('list.html',tasks=output,active='task_list')
+		return render_template('list.html',tasks=output,active='task_list',show_recipient=show_recipient)
 
 @app.route('/delete_task')
 def delete_task():

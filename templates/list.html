@@ -35,6 +35,11 @@
 							<th >
 								Method
 							</th>
+							{% if show_recipient=='true' %}
+							<th >
+								Recipient
+							</th>
+							{% endif %}
 							<th >
 								Delete
 							</th>	
@@ -63,6 +68,11 @@
 						<td>
 							{{task['method']}}
 						</td>
+						{% if show_recipient=='true' %}
+						<td>
+							{{task['details']}}
+						</td>
+						{% endif %}
 						<td>
 							<a href="/delete_task?id={{task['_id']}}">Delete</a>
 						</td>
