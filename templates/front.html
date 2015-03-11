@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head %}
+<link rel="stylesheet" href="/static/flexslider/flexslider.css">  
+<link rel="stylesheet" href="/static/parallax-slider/css/parallax-slider.css">
+{% endblock %}
 {% block content %}
 
     <div class="slider-inner">
@@ -136,4 +140,16 @@
   
       
 
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="/static/flexslider/jquery.flexslider-min.js"></script>
+  <script type="text/javascript" src="/static/parallax-slider/js/modernizr.js"></script>
+  <script type="text/javascript" src="/static/parallax-slider/js/jquery.cslider.js"></script>
+  <script type="text/javascript">
+    jQuery(document).ready(function() {
+        App.init();
+        App.initSliders();
+        Index.initParallaxSlider();        
+    });
+</script>
 {% endblock %}

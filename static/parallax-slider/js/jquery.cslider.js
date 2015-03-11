@@ -36,13 +36,13 @@
 			
 			this.$slides.eq( this.current ).addClass( 'da-slide-current' );
 			
-			var $navigation		= $( '<nav class="da-dots"/>' );
+			/*var $navigation		= $( '<nav class="da-dots"/>' );
 			for( var i = 0; i < this.slidesCount; ++i ) {
 			
 				$navigation.append( '<span/>' );
 			
 			}
-			$navigation.appendTo( this.$el );
+			$navigation.appendTo( this.$el );*/
 			
 			this.$pages			= this.$el.find('nav.da-dots > span');
 			this.$navNext		= this.$el.find('span.da-arrows-next');
@@ -157,8 +157,8 @@
 		},
 		_updatePage			: function() {
 		
-			this.$pages.removeClass( 'da-dots-current' );
-			this.$pages.eq( this.current ).addClass( 'da-dots-current' );
+			//this.$pages.removeClass( 'da-dots-current' );
+			//this.$pages.eq( this.current ).addClass( 'da-dots-current' );
 		
 		},
 		_startSlideshow		: function() {
