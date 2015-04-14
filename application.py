@@ -893,7 +893,7 @@ def task_worker(_id,instant=False):
                                    from_="+14157499397",
                                    url=app.config['HOST']+'/'+response_file,
                                    method='get',
-                                   record="true",
+                                   record="false",
                                    timeout="30")
 		app.logger.debug('Checking voice reminders')
 		if(task['type']=='one-time'):
