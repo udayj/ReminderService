@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<Response>
+		<Say voice="alice" language="en-IN">This service is provided by Remindica.com - an automated communications platform - visit remindica.com - thank you</Say>
+	</Response>
