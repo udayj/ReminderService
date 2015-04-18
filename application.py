@@ -960,7 +960,8 @@ def task_worker(_id,instant=False):
               "to": [recipient],
               "subject": subject,
               "text": text,
-              "html":html}
+              "html":html,
+              "h:Reply-To":user['email']}
 		p=multiprocessing.Process(target=send_mail,args=(data,files,))
 		p.start()
 		
