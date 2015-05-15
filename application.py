@@ -891,7 +891,7 @@ def task_worker(_id,instant=False):
 		call = client.calls.create(to=task['details'],  # Any phone number
                                   #from_="+16065474465", # Must be a valid Twilio number
                                    from_="+14157499397",
-                                   url=app.config['HOST']+'/'+response_file,
+                                   url=app.config['HOST_TWILIO']+'/'+response_file,
                                    method='get',
                                    record="false",
                                    timeout="30")
