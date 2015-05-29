@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/stylesheets/jquery-ui.min.css">
+<link rel="stylesheet" href="/static/stylesheets/faq.css">
+<link rel="stylesheet" href="/static/stylesheets/registration.css">
+ <script type="text/javascript"
+      src="//static.twilio.com/libs/twiliojs/1.2/twilio.min.js"></script>
+      <script type="text/javascript">
+
+      Twilio.Device.setup("{{ token }}");
+
+      Twilio.Device.ready(function (device) {
+        $("#log").text("Ready");
+      });
+
+      Twilio.Device.error(function (error) {
+        $("#log").text("Error: " + error.message);
+      });
+
+      Twilio.Device.connect(function (conn) {
+        $("#log").text("Successfully established call");
+      });
+
+      Twilio.Device.disconnect(function (conn) {
+        $("#log").text("Call ended");
+      });
+
+      Twilio.Device.incoming(function (conn) {
+        $("#log").text("Incoming connection from " + conn.parameters.From);
+        // accept the incoming connection and start two-way audio
+        conn.accept();
+      });
+
+      function call() {
+        // get the phone number to connect the call to
+        params = {"PhoneNumber": $("#phone_number").val()};
+
+
+        Twilio.Device.connect(params);
+        //Twilio.Device.connect(params);
+      }
+
+      function hangup() {
+        Twilio.Device.disconnectAll();
+      }
+    </script>
+{% endblock %}
+
+{% block content %}
+
+
+
+
+    <div class="breadcrumbs-v2 faq-breadcrumb margin-bottom-20">
+        <div class="breadcrumbs-v2-in">
+            <h1>Call Now</h1>
+            <ul class="breadcrumb-v2 list-inline">
+                <li>
+            </ul>
+        </div>    
+    </div>
+
+<!--=== FAQ Page ===-->
+    <div class="container content faq-page">
+       
+       
+
+<div class="container content">     
+        <div class="row">            
+            <div class="col-md-9">
+                <!-- General Questions -->
+                <div class="headline"><h2>Turn your browser into a phone</h2></div>
+                
+
+                <div class="row">
+            <div class="col-md-8 col-md-offset-2 col-sm-12">
+                <form class="reg-page" id="form">
+                    <div class="reg-header">            
+                        <h2>Call Any Number in India</h2>
+                        <p>Requires a microphone and speaker on your machine.</p>
+                    </div>
+
+                    <div class="input-group margin-bottom-20">
+                        <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                        
+                        <input type="text" id="phone_number" class="form-control" name="phone_number" placeholder="Phone Number">
+                    </div>                    
+                    
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <button class="btn-u " type="button" onclick="call()">Call</button>                             
+
+                        </div>
+                        <div class="col-md-1">
+                            
+
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn-u" type="button" onclick="hangup()">Hang Up</button>                        
+                        </div>
+                    </div>
+
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-9">
+                    <div class="alert alert-info fade in" id="log">
+                    </div>
+                </div>
+                    
+
+                </div>
+                </form>            
+            </div>
+        </div><!--/row-->
+                <!-- End General Questions -->
+            </div>
+            <div class="col-md-3">
+                <!-- Contacts -->
+                <div class="headline"><h2>Contacts</h2></div>
+                <ul class="list-unstyled who margin-bottom-30">
+                    <li><i class="fa fa-home"></i>India</li>
+                    <li><i class="fa fa-envelope-o"></i>support@remindica.com</li>
+                    <li><i class="fa fa-phone"></i>+91-9830906922</li>
+                    <li><i class="fa fa-globe"></i>https://www.remindica.com</li>
+                </ul>
+
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+  
+      
+
+{% endblock %}
+
+

@@ -25,6 +25,8 @@ from datetime import datetime,timedelta
 import multiprocessing
 from werkzeug import secure_filename
 import os
+from twilio.util import TwilioCapability
+import twilio.twiml
 
 SECRET_KEY='SECRET'
 
@@ -791,6 +793,41 @@ def perform_task():
 	else:
 		app.logger.error("ERROR in performing task: "+_id)
 		return render_template('task_completion.html')
+
+@app.route('/browser_phone')
+@login_required
+def browser_phone():
+	
+	account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
+	auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
+	 
+	application_sid = "AP35b7f8306568e5658b63296d545b6721"
+	 
+	capability = TwilioCapability(account_sid, auth_token)
+	capability.allow_client_outgoing(application_sid)
+	token = capability.generate()
+	return render_template('browser_phone.html',token=token)
+
+caller_id = "+14157499397"
+default_client = "jenny"
+
+@app.route('/voice_call')
+def voice_call():
+	
+	
+	dest_number = request.args.get('PhoneNumber')
+	resp = twilio.twiml.Response()
+	caller_id = "+14157499397"
+	    
+	
+	
+	with resp.dial(callerId=caller_id) as r:
+	    # If we have a number, and it looks like a phone number:
+	    if dest_number and re.search('^[\d\(\)\- \+]+$', dest_number):
+	        r.number(dest_number)
+	    else:
+	        r.client(default_client)
+	
 
 def task_worker(_id,instant=False):
 	def send_mail(data,files):
