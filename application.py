@@ -811,7 +811,7 @@ def browser_phone():
 caller_id = "+14157499397"
 default_client = "jenny"
 
-@app.route('/voice_call',methods=['POST'])
+@app.route('/voice_call',methods=['GET','POST'])
 def voice_call():
 	
 	
