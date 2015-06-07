@@ -830,7 +830,8 @@ def voice_call():
 	        r.number(dest_number)
 	    else:
 	        r.client(default_client)
-	
+	response=Response(resp,status=200,mimetype='application/xml')
+	return resp
 
 def task_worker(_id,instant=False):
 	def send_mail(data,files):
