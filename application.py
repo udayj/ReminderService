@@ -831,7 +831,7 @@ def voice_call():
 	    else:
 	        r.client(default_client)
 	response=Response(resp,status=200,mimetype='application/xml')
-	return resp
+	return response
 
 def task_worker(_id,instant=False):
 	def send_mail(data,files):
