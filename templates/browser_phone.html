@@ -34,7 +34,7 @@
 
       function call() {
         // get the phone number to connect the call to
-        params = {"PhoneNumber": $("#phone_number").val()};
+        params = {"PhoneNumber": $("#phone_number").val(),"CallerId": $("#caller_id").val()};
 
 
         Twilio.Device.connect(params);
@@ -87,6 +87,11 @@
                         <input type="text" id="phone_number" class="form-control" name="phone_number" placeholder="Phone Number">
                     </div>                    
                     
+                    <div class="input-group margin-bottom-20">
+                        <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                        
+                        <input type="text" id="caller_id" class="form-control" name="caller_id" placeholder="Verified Caller Id">
+                    </div>
 
                     <div class="row">
                         <div class="col-md-2">
