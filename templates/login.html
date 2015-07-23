@@ -2,11 +2,12 @@
 
 {% block head %}
 <link rel="stylesheet" href="/static/stylesheets/jquery-ui.min.css">
+<link rel="stylesheet" href="/static/stylesheets/registration.css">
 {% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="/static/stylesheets/registration.css">
+
 
 <div class="breadcrumbs">
   <div class="container">
@@ -48,8 +49,11 @@
                     </div>                    
 
                     <div class="row">
-                        <div class="col-md-6">
-                                                 
+                        <div class="col-md-6" style="padding-left:30px;">
+                          <label class="checkbox">
+                          <input name="remember_me" id="remember_me" type="checkbox">
+                          Stay signed in
+                          </label>                                                 
                         </div>
                         <div class="col-md-6">
                             <button class="btn-u pull-right" type="submit">Login</button>                        
