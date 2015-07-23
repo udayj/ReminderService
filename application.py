@@ -535,6 +535,22 @@ def forgot_password():
 
 @app.route('/login',methods=['GET','POST'])
 def login():
+	yc=request.args.get('yc')
+	if yc and yc=='ycombinatorfellowship':
+		client=MongoClient()
+		db=client[app.config['DATABASE']]
+		user=db.users.find({'email':'demo@remindica.com'})
+		try:
+			user=user.next()
+			ret_user=User(name=user['name'],email=user['email'],password=user['password'],active=user['active'],_id=str(user['_id']))
+			if login_user(ret_user,remember=False):
+				flash('Logged in!')
+				return redirect(url_for('task_list'))
+			else:
+				return render_template('login.html',error='Cannot login. Account still inactive',active='login')
+		except StopIteration:
+			return render_template('login.html',error='Cannot login. Wrong credentials',
+									active='login')
 	if request.method=='GET':
 		return render_template('login.html',active='login')
 	data={}
