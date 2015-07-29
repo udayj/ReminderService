@@ -661,7 +661,19 @@ def task():
 	except:
 		return render_template('task_error.html')
 
+@app.route("/user_meta_data")
+@login_required
+def user_meta_data():
 
+	output=[]
+	_id=current_user.id
+	email=current_user.email
+	output.append({'id':_id,'email':email})
+	
+	js=json.dumps(output)
+	
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
 
 @app.route('/task_list',methods=['GET','POST'])
 @login_required
@@ -1082,6 +1094,7 @@ def task_worker(_id,instant=False):
 		db.reminders.save(task)
 		return 1
 	return 1
+
 
 if app.debug is None or app.debug is False or app.debug is True:   
 	    import logging
