@@ -5,8 +5,8 @@ from bson.objectid import ObjectId
 import json
 import random
 from flask.ext.login import (LoginManager, current_user, login_required,
-                            login_user, logout_user, UserMixin, AnonymousUser,
-                            confirm_login, fresh_login_required,login_url)
+                            login_user, logout_user, UserMixin, confirm_login,
+                             fresh_login_required,login_url)
 from flask.ext.mail import Message, Mail
 import hashlib
 import requests
@@ -323,7 +323,7 @@ def load_token(token):
         return user
     return None
 
-login_manager.setup_app(app)
+login_manager.init_app(app)
 
 
 
