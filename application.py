@@ -730,6 +730,7 @@ def task_list():
 
 
 		output.append(task)
+
 	
 	if request.method=='POST':
 		data={}
@@ -839,10 +840,29 @@ def task_list():
 			return render_template('new_task.html',tasks=output,error='Problem submitting task. Try again later',active='new_task')
 			
 	output.sort(key=sorter)
+	
+	
+		
+	
+	json_format=request.args.get('format')
+
 	if archive=='true':
 		return render_template('list.html',tasks=output,active='archive_task_list',archive='true',show_recipient=show_recipient)
 	else:
-		return render_template('list.html',tasks=output,active='task_list',show_recipient=show_recipient)
+		if json_format=='json':
+			new_output=[]
+			for individual_task in output:
+				new_dict={}
+				for fields in individual_task:
+					new_dict[str(fields)]=str(individual_task[fields])
+				new_output.append(new_dict)
+			js=json.dumps(new_output)
+	
+			resp=Response(js,status=200,mimetype='application/json')
+			return resp
+		else:
+			return render_template('list.html',tasks=output,active='task_list',show_recipient=show_recipient)
+
 
 @app.route('/delete_task')
 def delete_task():
