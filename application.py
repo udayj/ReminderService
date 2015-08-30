@@ -790,25 +790,32 @@ def task_list():
 			if task['method']=='sms' or task['method']=='voice':
 				if task['details'][0]=='+':
 					pass
+					
 				elif task['details'][0]=='0':
+					
 					task['details']=country_code+task['details'][1:]
 				else:
+					
 					task['details']=country_code+task['details']
 
 			_id=db.reminders.save(task)
 			task['_id']=_id
-			attachment=request.files['attachment']
-			if attachment:
-				if allowed_file(attachment.filename):
-					attachment_name='attachment_'+str(_id)+'.'+attachment.filename.rsplit('.', 1)[1]
-					attachment.save(os.path.join(app.config['UPLOAD_FOLDER'],attachment_name))
-					task['attachment']=os.path.join(app.config['UPLOAD_FOLDER'],attachment_name)
-					task['attachment_name']=attachment_name
-					task['attachment_original_name']=attachment.filename
-					db.reminders.save(task)
-			else: 
-				app.logger.debug('problem with attachment')
-
+			
+			
+			if request.headers.get('Content-Type')=='multipart/form-data':
+				attachment=request.files['attachment']
+				
+				if attachment:
+					if allowed_file(attachment.filename):
+						attachment_name='attachment_'+str(_id)+'.'+attachment.filename.rsplit('.', 1)[1]
+						attachment.save(os.path.join(app.config['UPLOAD_FOLDER'],attachment_name))
+						task['attachment']=os.path.join(app.config['UPLOAD_FOLDER'],attachment_name)
+						task['attachment_name']=attachment_name
+						task['attachment_original_name']=attachment.filename
+						db.reminders.save(task)
+				else: 
+					app.logger.debug('problem with attachment')
+			
 
 			if task['method']=='voice':
 				task['voice_response']=os.path.join(app.config['UPLOAD_FOLDER'],'response_'+str(_id)+'.xml')
@@ -834,7 +841,7 @@ def task_list():
 								task['time'].strftime('%I:%M %p')
 			output.append(task)
 		except Exception as inst:
-			app.logger.debug(inst)
+			app.logger.error(inst)
 			app.logger.error('Problem submitting task')
 			output.sort(key=sorter)
 			return render_template('new_task.html',tasks=output,error='Problem submitting task. Try again later',active='new_task')
@@ -926,6 +933,22 @@ def voice_call():
 	        r.client(default_client)
 
 	return str(resp)
+
+@app.route('/token')
+@login_required
+def token():
+	account_sid = "ACbb51060d0fb44e38bccbde905f0781ae"
+	auth_token = "7c4e788704bc432a8c7ed2ae72404e12"
+		 
+	app_sid = "AP41d2664cbac3855a4e00a48443d1c36a"
+	capability = TwilioCapability(account_sid, auth_token)
+	# This allows outgoing connections to TwiML application
+	
+	capability.allow_client_outgoing(app_sid)
+	# This allows incoming connections to client (if specified)
+	
+	# This returns a token to use with Twilio based on the account and capabilities defined above
+	return capability.generate()
 
 def task_worker(_id,instant=False):
 	def send_mail(data,files):
