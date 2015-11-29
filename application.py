@@ -1011,7 +1011,7 @@ def task_worker(_id,instant=False):
 		task_status={}
 		task_status['task_id']=task['_id']
 		task_status['method']=task['method']
-		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
+		task_status['time_performed']=datetime.now()+timedelta(hours=10,minutes=30)
 		task_status['status']='-'
 		task_status['sms_id']=message.sid
 		
@@ -1019,7 +1019,7 @@ def task_worker(_id,instant=False):
 
 		url_task={}
 		url_task['type']='one-time'
-		url_task['time']=datetime.now()+timedelta(hours=9,minutes=32)
+		url_task['time']=datetime.now()+timedelta(hours=10,minutes=32)
 		url_task['state']='active'
 		url_task['timezone']='IST'
 		url_task['method']='http'
@@ -1059,7 +1059,7 @@ def task_worker(_id,instant=False):
 		task_status={}
 		task_status['task_id']=task['_id']
 		task_status['method']=task['method']
-		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
+		task_status['time_performed']=datetime.now()+timedelta(hours=10,minutes=30)
 		task_status['status']='-'
 		task_status['call_id']=call.sid
 		
@@ -1067,7 +1067,7 @@ def task_worker(_id,instant=False):
 
 		url_task={}
 		url_task['type']='one-time'
-		url_task['time']=datetime.now()+timedelta(hours=9,minutes=32)
+		url_task['time']=datetime.now()+timedelta(hours=10,minutes=32)
 		url_task['state']='active'
 		url_task['timezone']='IST'
 		url_task['method']='http'
@@ -1129,7 +1129,7 @@ def task_worker(_id,instant=False):
 		task_status={}
 		task_status['task_id']=task['_id']
 		task_status['type']=task['type']
-		task_status['time_performed']=datetime.now()+timedelta(hours=9,minutes=30)
+		task_status['time_performed']=datetime.now()+timedelta(hours=10,minutes=30)
 		task_status['status']='sent'
 		db.status.save(task_status)
 
