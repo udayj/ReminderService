@@ -393,7 +393,7 @@ def signup():
 		salt='reminderserviceactivateusingtoken'
 		activation_hash=hashlib.sha512(salt+data['email']).hexdigest()[10:30]
 		
-		exist_user=db.users.find({'email':data['email']})
+		exist_user=db.users.find({'email':data['email'].lower()})
 		try:
 			exist_user.next()
 			return render_template('signup.html',active='signup',signup_error='Email already exists',username=username,email=data['email'])
@@ -401,7 +401,7 @@ def signup():
 			pass
 
 		_id=db.users.save({'name':username,
-					   'email':data['email'],
+					   'email':data['email'].lower(),
 					   'password':hashlib.sha512(SALT+data['password']).hexdigest(),
 					   'activation_hash':activation_hash,
 					   'active':False})
@@ -532,11 +532,28 @@ def forgot_password():
 			return render_template('forgot-password.html',error="Please enter correct email id to reset password")			
 
 
+@app.route('/update_emails')
+def update_emails():
+	client=MongoClient()
+	db=client[app.config['DATABASE']]
+	users=db.users.find()
+	for user in users:
+		user['email']=user['email'].lower()
+		db.users.save(user)
+	output=[]
+	output.append({'result':'success'})
+	
+	js=json.dumps(output)
+	
+	resp=Response(js,status=200,mimetype='application/json')
+	return resp
+
+
 
 @app.route('/login',methods=['GET','POST'])
 def login():
-	yc=request.args.get('yc')
-	if yc and yc=='ycombinatorfellowship':
+	yc=request.args.get('user')
+	if yc and yc=='special_demo':
 		client=MongoClient()
 		db=client[app.config['DATABASE']]
 		user=db.users.find({'email':'demo@remindica.com'})
@@ -571,7 +588,7 @@ def login():
 	client=MongoClient()
 	db=client[app.config['DATABASE']]
 	password=hashlib.sha512(SALT+password).hexdigest()
-	user=db.users.find({'email':username,'password':password})
+	user=db.users.find({'email':username.lower(),'password':password})
 	try:
 		user=user.next()
 		ret_user=User(name=user['name'],email=user['email'],password=user['password'],active=user['active'],_id=str(user['_id']))
