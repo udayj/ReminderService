@@ -692,6 +692,41 @@ def user_meta_data():
 	resp=Response(js,status=200,mimetype='application/json')
 	return resp
 
+@app.route('/remindica_email_marketing',methods=['GET','POST'])
+@login_required
+def remindica_marketing_email():
+	def send_mail(data):
+		result=requests.post(
+        "https://api.mailgun.net/v2/remindica.com/messages",
+        auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
+        data=data)
+		
+		app.logger.debug(result)
+
+	if request.method=='GET':
+		return render_template('remindica_email.html')		
+	else:
+		data={}
+		for name,value in dict(request.form).iteritems():
+			data[name]=value[0].strip()
+		app.logger.debug(str(data))
+		html=render_template('remindica_marketing.html')
+		text='Send Automated Phone Calls, SMS, Emails - Payment Reminder Software, Call 9830906922 for a free demo.'
+		data_email={"from": "Payment Reminder Software" + " <admin@remindica.com>",
+		      "to": [data['email']],
+		      "subject": 'Send Automated Phone Calls, SMS, Emails - Payment Reminder Software',
+		      "text": text,
+		      "html":html,
+		      "h:Reply-To":'admin@remindica.com'}
+		p=multiprocessing.Process(target=send_mail,args=(data_email,))
+		p.start()
+				
+		
+		return render_template('remindica_email.html',message='Email sent to '+ data['email'])
+
+
+
+
 @app.route('/task_list',methods=['GET','POST'])
 @login_required
 def task_list():
