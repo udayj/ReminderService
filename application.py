@@ -28,6 +28,7 @@ import os
 from twilio.util import TwilioCapability
 import twilio.twiml
 from itsdangerous import URLSafeTimedSerializer
+from xml.sax.saxutils import escape
 
 SECRET_KEY='SECRET'
 
@@ -874,7 +875,7 @@ def task_list():
 				output_file=codecs.open('static/data/response_'+str(_id)+'.xml','w','utf-8')
 				response='<?xml version="1.0" encoding="UTF-8"?>\
 					<Response>\
-					    <Say voice="alice" language="en-IN">'+task['message']+'</Say>\
+					    <Say voice="alice" language="en-IN">'+escape(task['message'])+'</Say>\
 					</Response>'
 				output_file.write(response)
 				output_file.close()
