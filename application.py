@@ -798,9 +798,9 @@ def task_list():
 			output.sort(key=sorter)
 			return render_template('list.html',tasks=output,error='Problem submitting task. Try again later')
 		try:
-			year=2013
-			month=7
-			day=7
+			year=datetime.now().year
+			month=datetime.now().month
+			day=datetime.now().day
 			try:
 				date=data['date'].split("/")
 				year=int(date[2])
@@ -839,6 +839,10 @@ def task_list():
 			task['day_of_month']=int(data['month-type'].lower())
 			task['creator_id']=ObjectId(current_user.id)
 			task['creation_time']=datetime.now()
+			try:
+				task['start_after']=int(data['start-after'])
+			except:
+				task['start-after']=0
 
 			if task['method']=='sms' or task['method']=='voice':
 				if task['details'][0]=='+':
