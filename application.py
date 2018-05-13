@@ -1013,7 +1013,8 @@ def task_worker(_id,instant=False):
         "https://api.mailgun.net/v3/remindica.com/messages",
         auth=("api", "key-1b9979216cd5d2f065997d3d53852cd6"),
         files=files,
-        data=data)
+        data=data,
+        verify=False)
 		
 		app.logger.debug(result)
 
